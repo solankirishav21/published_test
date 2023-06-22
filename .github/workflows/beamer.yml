@@ -8,6 +8,5 @@ jobs:
   push-release-notes:
     runs-on: ubuntu-latest
     steps:
-    - name: Push Release Notes to Beamer
-      run: |
-        print("Published")
+    - name: Display workflow trigger message
+      run: echo "Version released"
