@@ -1,0 +1,13 @@
+name: Push Release Notes to Beamer
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  push-release-notes:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Push Release Notes to Beamer
+      run: |
+        print("Published")
