@@ -7,7 +7,6 @@ jobs:
   push-release-notes:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1.0.1
       - name: "call action"
         id: last_release
         uses: solankririshav21/get-latest-release@1
