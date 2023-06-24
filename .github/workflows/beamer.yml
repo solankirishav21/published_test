@@ -25,5 +25,6 @@ jobs:
       - name: Print result
         run: |
           echo "Latest Release ID: ${{ steps.latest_release.outputs.id }}"
+          echo "tag_name: ${{ steps.last_release.outputs.tag_name }}"
           echo "Release Notes:"
           echo "${{ steps.release_notes.outputs.notes }}"
