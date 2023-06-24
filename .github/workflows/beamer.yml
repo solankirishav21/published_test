@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: "call action"
         id: last_release
-        uses: solankririshav21/get-latest-release@1
+        uses: InsonusK/get-latest-release@v1.0.1
         with:
           myToken: ${{ secrets.MY_TOKEN }}
           exclude_types: "draft|prerelease"
