@@ -1,28 +1,25 @@
 name: Push Release Notes to Beamer
 
 on:
-  release:
-    types: [edited]
+  workflow_dispatch
 
 jobs:
   push-release-notes:
     runs-on: ubuntu-latest
     steps:
-    - name: Push Release Notes to Beamer
-      run: |
-        # Set up variables
-        BEAMER_API_TOKEN="${{ secrets.BEAMER_API_KEY }}"
-        RELEASE_TAG="${{ github.event.release.tag_name }}"
-        RELEASE_NOTES="${{github.event.release.body}}"
-
-        # Push release notes to Beamer
-        curl --request POST \
-          --url https://api.getbeamer.com/v0/posts \
-          --header "Content-Type: application/json" \
-          --header "Beamer-Api-Key: $BEAMER_API_TOKEN" \
-          --data "{
-            \"title\": [ \"New Release: $RELEASE_TAG\" ],
-            \"content\": [ \"$RELEASE_NOTES\" ],
-            \"category\": \"new\",
-            \"publish\": true
-          }"
+      - uses: actions/checkout@v1
+      - name: "call action"
+        id: last_release
+        uses: InsonusK/get-latest-release@v1.0.1
+        with:
+          myToken: ${{ github.token }}
+          exclude_types: "release"
+          view_top: 1
+      - name: "Print result"
+        run: |
+          echo "id: ${{ steps.last_release.outputs.id }}"
+          echo "name: ${{ steps.last_release.outputs.name }}"
+          echo "tag_name: ${{ steps.last_release.outputs.tag_name }}"
+          echo "created_at: ${{ steps.last_release.outputs.created_at }}"
+          echo "draft: ${{ steps.last_release.outputs.draft }}"
+          echo "prerelease: ${{ steps.last_release.outputs.prerelease }}"
