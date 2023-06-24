@@ -2,7 +2,7 @@ name: Push Release Notes to Beamer
 
 on:
   release:
-    types: [published]
+    types: [edited]
 
 jobs:
   push-release-notes:
