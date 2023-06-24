@@ -8,24 +8,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: "Get Latest Release"
-        id: last_release
+      - name: Get Latest Release ID
+        id: latest_release
         run: |
-          release=$(curl -sH "Authorization: Bearer ${{ github.token }}" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/latest")
-          echo "::set-output name=id::$(echo "$release" | jq -r '.id')"
-          echo "::set-output name=name::$(echo "$release" | jq -r '.name')"
-          echo "::set-output name=tag_name::$(echo "$release" | jq -r '.tag_name')"
-          echo "::set-output name=created_at::$(echo "$release" | jq -r '.created_at')"
-          echo "::set-output name=draft::$(echo "$release" | jq -r '.draft')"
-          echo "::set-output name=prerelease::$(echo "$release" | jq -r '.prerelease')"
-          echo "::set-output name=notes::$(echo "$release" | jq -r '.body')"
-      - name: "Print result"
+          release_id=$(curl -sH "Authorization: Bearer ${{ github.token }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/latest" \
+            | jq -r '.id')
+          echo "::set-output name=id::$release_id"
+      - name: Get Release Notes
+        id: release_notes
         run: |
-          echo "id: ${{ steps.last_release.outputs.id }}"
-          echo "name: ${{ steps.last_release.outputs.name }}"
-          echo "tag_name: ${{ steps.last_release.outputs.tag_name }}"
-          echo "created_at: ${{ steps.last_release.outputs.created_at }}"
-          echo "draft: ${{ steps.last_release.outputs.draft }}"
-          echo "prerelease: ${{ steps.last_release.outputs.prerelease }}"
-          echo "release_notes: ${{ steps.last_release.outputs.notes }}"
+          release_body=$(curl -sH "Authorization: Bearer ${{ github.token }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/${{ steps.latest_release.outputs.id }}" \
+            | jq -r '.body')
+          echo "::set-output name=notes::$release_body"
+      - name: Print result
+        run: |
+          echo "Latest Release ID: ${{ steps.latest_release.outputs.id }}"
+          echo "Release Notes:"
+          echo "${{ steps.release_notes.outputs.notes }}"
