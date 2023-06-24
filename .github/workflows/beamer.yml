@@ -7,13 +7,19 @@ jobs:
   push-release-notes:
     runs-on: ubuntu-latest
     steps:
-      - name: "call action"
+      - uses: actions/checkout@v1
+      - name: "Get Latest Release"
         id: last_release
-        uses: InsonusK/get-latest-release@v1.0.1
-        with:
-          myToken: ${{ secrets.MY_TOKEN }}
-          exclude_types: "draft|prerelease"
-          view_top: 1
+        run: |
+          release=$(curl -sH "Authorization: Bearer ${{ github.token }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/latest")
+          echo "::set-output name=id::$(echo "$release" | jq -r '.id')"
+          echo "::set-output name=name::$(echo "$release" | jq -r '.name')"
+          echo "::set-output name=tag_name::$(echo "$release" | jq -r '.tag_name')"
+          echo "::set-output name=created_at::$(echo "$release" | jq -r '.created_at')"
+          echo "::set-output name=draft::$(echo "$release" | jq -r '.draft')"
+          echo "::set-output name=prerelease::$(echo "$release" | jq -r '.prerelease')"
+          echo "::set-output name=notes::$(echo "$release" | jq -r '.body')"
       - name: "Print result"
         run: |
           echo "id: ${{ steps.last_release.outputs.id }}"
