@@ -19,7 +19,5 @@ jobs:
       
       - name: "Print result"
         run: |
-          echo "id: ${{ steps.last_release.outputs.id }}"
-          echo "name: ${{ steps.last_release.outputs.name }}"
           echo "tag_name: ${{ steps.last_release.outputs.tag_name }}"
           echo "notes: ${{ steps.last_release.outputs.body }}"
