@@ -7,10 +7,18 @@ jobs:
   push-release-notes:
     runs-on: ubuntu-latest
     steps:
-    - name: Push Release Notes to Beamer
+    - uses: actions/checkout@v1
+    - name: "call action"
+      id: last_release
+      uses: InsonusK/get-latest-release@v1.0.1
+      with:
+        myToken: ${{ github.token }}
+        exclude_types: "release"
+        view_top: 1
+    - name: "Print result"
       run: |
-        # Set up variables
-        echo "RELEASE_TAG: ${{ github.event.inputs.tag_name }}"
-        echo "RELEASE_NOTES: ${{ github.event.inputs.release_notes }}"
-
+        echo "id: ${{ steps.last_release.outputs.id }}"
+        echo "name: ${{ steps.last_release.outputs.name }}"
+        echo "tag_name: ${{ steps.last_release.outputs.tag_name }}"
+       
  
