@@ -7,18 +7,14 @@ jobs:
   push-release-notes:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      
-      - name: "Call action"
-        id: last_release
-        uses: InsonusK/get-latest-release@v1.0.1
-        with:
-          myToken: ${{ secrets.MY_TOKEN }}
-          exclude_types: "draft|prerelease"
-          view_top: 1
-      
-      - name: "Print result"
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get Latest Release
+        id: get_latest_release
         run: |
-          echo "tag_name: ${{ steps.last_release.outputs.tag_name }}"
-          echo "notes: ${{ steps.last_release.outputs.body }}"
-          echo "${{ toJson(steps.last_release) }}"
+          release_json=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                        "https://api.github.com/repos/${{ github.repository }}/releases/latest")
+          echo "::set-output name=tag_name::$(echo "$release_json" | jq -r '.tag_name')"
+          echo "::set-output name=description::$(echo "$release_json" | jq -r '.body')"
+
