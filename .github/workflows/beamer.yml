@@ -21,3 +21,4 @@ jobs:
         run: |
           echo "tag_name: ${{ steps.last_release.outputs.tag_name }}"
           echo "notes: ${{ steps.last_release.outputs.body }}"
+          echo "${{ toJson(steps.last_release) }}"
