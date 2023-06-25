@@ -17,15 +17,17 @@ jobs:
           exclude_types: "draft|prerelease"
           view_top: 1
 
-      - name: "Get release description"
-        id: release_description
+      - name: Get release description
+        id: get_release
         run: |
-          release_id=${{ steps.last_release.outputs.id }}
-          access_token=${{ secrets.MY_TOKEN }}
+          release_id=109827130
+          access_token=${{ secrets.ACCESS_TOKEN }}
           description=$(curl -s -H "Authorization: token $access_token" \
-                       "https://api.github.com/repos/${{ github.repository }}/releases/$release_id" | \
+                       "https://api.github.com/repos/solankirishav21/published_test/releases/$release_id" | \
                        jq -r '.body')
           echo "DESCRIPTION=$description" >> $GITHUB_ENV
+        shell: bash
+
 
       - name: "Print result"
         run: |
