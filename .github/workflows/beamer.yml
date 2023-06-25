@@ -14,7 +14,7 @@ jobs:
         id: latest_release
         run: |
           API_URL="https://api.github.com/repos/solankirishav21/published_test/releases/latest"
-          LATEST_RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.MY_TOKEN }}" $API_URL)
+          LATEST_RELEASE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" $API_URL)
           RELEASE_TAG=$(echo $LATEST_RELEASE | jq -r '.tag_name')
           RELEASE_BODY=$(echo $LATEST_RELEASE | jq -r '.body')
           echo "RELEASE_TAG=${RELEASE_TAG}" >> $GITHUB_ENV
@@ -22,5 +22,5 @@ jobs:
 
       - name: Print result
         run: |
-          echo "Tag name: ${{ env.RELEASE_TAG }}"
-          echo "Release body: ${{ env.RELEASE_BODY }}"
+          echo "Tag name: ${RELEASE_TAG}"
+          echo "Release body: ${RELEASE_BODY}"
