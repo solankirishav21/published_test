@@ -10,23 +10,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Get latest release
-        id: latest_release
+      - name: Get Latest Release
+        id: get_latest_release
         run: |
-          ACCESS_TOKEN="${{ secrets.MY_TOKEN }}"
-          API_URL="https://api.github.com/repos/OWNER/REPO/releases/latest"
-          RELEASE_DATA=$(curl -s -H "Authorization: Bearer $ACCESS_TOKEN" $API_URL)
-          RELEASE_TAG=$(echo $RELEASE_DATA | jq -r '.tag_name')
-          RELEASE_BODY=$(echo $RELEASE_DATA | jq -r '.body')
-          echo "RELEASE_TAG=${RELEASE_TAG}" >> temp_file
-          echo "RELEASE_BODY=${RELEASE_BODY}" >> temp_file
-
-      - name: Set environment variables
-        run: |
-          echo "::set-env name=RELEASE_TAG::$(cat temp_file | grep RELEASE_TAG | cut -d'=' -f2)"
-          echo "::set-env name=RELEASE_BODY::$(cat temp_file | grep RELEASE_BODY | cut -d'=' -f2)"
+          release_json=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                        "https://api.github.com/repos/${{ github.repository }}/releases/latest")
+          echo "::set-output name=tag_name::$(echo "$release_json" | jq -r '.tag_name')"
+          echo "::set-output name=description::$(echo "$release_json" | jq -r '.body')"
 
       - name: Print result
         run: |
-          echo "Tag name: ${{ env.RELEASE_TAG }}"
-          echo "Release body: ${{ env.RELEASE_BODY }}"
+          echo "tag_name: ${{ steps.get_latest_release.outputs.tag_name }}"
+          echo "description: ${{ steps.get_latest_release.outputs.description }}"
