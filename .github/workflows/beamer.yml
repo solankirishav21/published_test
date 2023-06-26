@@ -37,10 +37,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Print result
+      - name: Push Release Notes to Beamer
+        env:
+          BEAMER_API_TOKEN: ${{ secrets.BEAMER_API_KEY }}
+          RELEASE_TAG: ${{ steps.get_latest_release.outputs.tag_name }}
+          RELEASE_NOTES: ${{ steps.get_latest_release.outputs.description_lines }}
         run: |
-          echo "Tag name: ${{ steps.get_latest_release.outputs.tag_name }}"
-          echo "Description lines:"
-          for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
-            echo "- $line"
-          done
+          # Push release notes to Beamer
+          for line in $RELEASE_NOTES; do
+            curl --request POST \
+              --url https://api.getbeamer.com/v0/posts \
+              --header "Content-Type: application/json" \
+              --header "Beamer-Api-Key: $BEAMER_API_TOKEN" \
+              --data "{
+                \"title\": [ \"New Release: $RELEASE_TAG\" ],
+                \"content\": [ \"$line\" ],
+                \"category\": \"new\",
+                \"publish\": true
+              }"
