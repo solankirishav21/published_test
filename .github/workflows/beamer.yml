@@ -37,6 +37,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Print Tag Name and Description
+        run: |
+          echo "Tag Name: ${{ steps.get_latest_release.outputs.tag_name }}"
+          echo "Description: ${{ steps.get_latest_release.outputs.description_lines }}"
+
       - name: Push Release Notes to Beamer
         env:
           BEAMER_API_TOKEN: ${{ secrets.BEAMER_API_KEY }}
