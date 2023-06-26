@@ -40,7 +40,10 @@ jobs:
       - name: Print Tag Name and Description
         run: |
           echo "Tag Name: ${{ steps.get_latest_release.outputs.tag_name }}"
-          echo "Description: ${{ steps.get_latest_release.outputs.description_lines }}"
+          echo "Description: |"
+          for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
+            echo "  $line"
+          done
 
       - name: Push Release Notes to Beamer
         env:
