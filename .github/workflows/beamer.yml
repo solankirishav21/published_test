@@ -17,14 +17,12 @@ jobs:
                         "https://api.github.com/repos/${{ github.repository }}/releases/latest")
           tag_name=$(echo "$release_json" | jq -r '.tag_name')
           description=$(echo "$release_json" | jq -r '.body')
-          IFS=$'\n' read -rd '' -a description_lines <<<"$description"
+          description_lines=$(echo "$description" | tr '\n' '|')
           echo "::set-output name=tag_name::$tag_name"
-          echo "::set-output name=description_lines::${description_lines[*]}"
+          echo "::set-output name=description_lines::$description_lines"
 
       - name: Print result
         run: |
           echo "tag_name: ${{ steps.get_latest_release.outputs.tag_name }}"
           echo "description_lines:"
-          for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
-            echo "  - $line"
-          done
+          echo "${{ steps.get_latest_release.outputs.description_lines }}" | tr '|' '\n'
