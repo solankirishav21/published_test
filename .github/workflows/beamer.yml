@@ -16,11 +16,15 @@ jobs:
           release_json=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
                         "https://api.github.com/repos/${{ github.repository }}/releases/latest")
           tag_name=$(echo "$release_json" | jq -r '.tag_name')
-          description=$(echo "$release_json" | jq -r '.body' | sed ':a;N;$!ba;s/\n/\\n/g')
+          description=$(echo "$release_json" | jq -r '.body')
+          IFS=$'\n' read -rd '' -a description_lines <<<"$description"
           echo "::set-output name=tag_name::$tag_name"
-          echo "::set-output name=description::$description"
+          echo "::set-output name=description_lines::${description_lines[@]}"
 
       - name: Print result
         run: |
           echo "tag_name: ${{ steps.get_latest_release.outputs.tag_name }}"
-          echo "description: ${{ steps.get_latest_release.outputs.description }}"
+          echo "description_lines:"
+          for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
+            echo "  - $line"
+          done
