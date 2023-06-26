@@ -19,7 +19,7 @@ jobs:
           description=$(echo "$release_json" | jq -r '.body')
           IFS=$'\n' read -rd '' -a description_lines <<<"$description"
           echo "::set-output name=tag_name::$tag_name"
-          echo "::set-output name=description_lines::${description_lines[@]}"
+          echo "::set-output name=description_lines::${description_lines[*]}"
 
       - name: Print result
         run: |
