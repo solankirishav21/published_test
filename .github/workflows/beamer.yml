@@ -10,19 +10,38 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
       - name: Get Latest Release
         id: get_latest_release
         run: |
-          release_json=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                        "https://api.github.com/repos/${{ github.repository }}/releases/latest")
-          tag_name=$(echo "$release_json" | jq -r '.tag_name')
-          description=$(echo "$release_json" | jq -r '.body')
-          description_lines=$(echo "$description" | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g')
-          echo "::set-output name=tag_name::$tag_name"
-          echo "::set-output name=description_lines::$description_lines"
+          python3 -m pip install --upgrade pip
+          python3 -m pip install requests
+          python3 - <<EOF
+          import os
+          import requests
+
+          github_token = os.getenv('GITHUB_TOKEN')
+          repo_owner = 'REPO_OWNER'
+          repo_name = 'REPO_NAME'
+          headers = {'Authorization': f'Bearer {github_token}'}
+          url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest'
+          response = requests.get(url, headers=headers)
+          data = response.json()
+
+          tag_name = data.get('tag_name')
+          description = data.get('body')
+          description_lines = description.split('\n')
+
+          print(f"::set-output name=tag_name::{tag_name}")
+          print(f"::set-output name=description_lines::{description_lines}")
+          EOF
 
       - name: Print result
         run: |
           echo "tag_name: ${{ steps.get_latest_release.outputs.tag_name }}"
           echo "description_lines:"
-          echo -e "${{ steps.get_latest_release.outputs.description_lines }}"
+          echo "${{ steps.get_latest_release.outputs.description_lines }}"
