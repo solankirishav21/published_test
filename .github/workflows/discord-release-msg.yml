@@ -1,18 +1,58 @@
-name: Release messages to Discord announcement channel
+name: Push Release Details to Discord
 
 on:
   workflow_dispatch
 
 jobs:
-  run_main:
+  push-release-details:
     runs-on: ubuntu-latest
-    name: Sends custom message
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Send release message
-        uses: nhevia/discord-styled-releases@main
-        with:
-          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
-          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+      - name: Get Latest Release
+        id: get_latest_release
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install requests
+          python3 - <<EOF
+          import os
+          import requests
+
+          github_token = os.getenv('GITHUB_TOKEN')
+          repo_owner = 'solankirishav21'
+          repo_name = 'published_test'
+          headers = {'Authorization': f'Bearer {github_token}'}
+          url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest'
+          response = requests.get(url, headers=headers)
+          data = response.json()
+
+          tag_name = data.get('tag_name')
+          description = data.get('body')
+          description_lines = description.split('\\n') if description else []
+
+          print(f"::set-output name=tag_name::{tag_name}")
+          print(f"::set-output name=description_lines::{description_lines}")
+          EOF
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print Tag Name and Description
+        run: |
+          echo "Tag Name: ${{ steps.get_latest_release.outputs.tag_name }}"
+          echo "Description: |"
+          for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
+            echo "  $line"
+          done
+
+      - name: Send Release Details to Discord
+        env:
+          DISCORD_WEBHOOK_ID: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          DISCORD_WEBHOOK_TOKEN: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          RELEASE_TAG: ${{ steps.get_latest_release.outputs.tag_name }}
+          RELEASE_DESCRIPTION: |
+            ${{ join(steps.get_latest_release.outputs.description_lines, '\n') }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d "{\"content\": \"New release details:\\nTag: $RELEASE_TAG\\nDescription: $RELEASE_DESCRIPTION\"}" \
+          "https://discord.com/api/webhooks/$DISCORD_WEBHOOK_ID/$DISCORD_WEBHOOK_TOKEN"
