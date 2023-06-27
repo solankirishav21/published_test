@@ -1,9 +1,7 @@
 name: Release messages to Discord announcement channel
 
 on:
-  release:
-    types:
-      - published
+  workflow_dispatch
 
 jobs:
   send_release_message:
