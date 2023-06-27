@@ -11,6 +11,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Install dependencies
+        run: npm install discord.js
+
       - name: Sending message
         run: node published_test/send-release-message.js
         env:
