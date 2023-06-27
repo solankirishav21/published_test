@@ -1,15 +1,28 @@
-name: Release messages to discord announcement channel
+name: Release messages to Discord announcement channel
 
-on: 
-  workflow_dispatch
+on:
+  release:
+    types:
+      - published
 
 jobs:
-  run_main:
+  send_release_message:
     runs-on: ubuntu-latest
-    name: Sends custom message
+
     steps:
-      - name: Discord - Styled Releases/Patch Notes
-        uses: nhevia/discord-styled-releases@v1.2.3
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
-          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Send release message
+        run: node send-release-message.js
+        env:
+          DISCORD_WEBHOOK_ID: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          DISCORD_WEBHOOK_TOKEN: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
