@@ -1,3 +1,4 @@
+
 const { WebhookClient, MessageEmbed } = require('discord.js');
 
 // Get the webhook ID and token from environment variables
