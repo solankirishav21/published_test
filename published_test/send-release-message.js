@@ -1,12 +1,12 @@
 
-const { WebhookClient, MessageEmbed } = require('discord.js');
-
-// Get the webhook ID and token from environment variables
 const webhookId = process.env.DISCORD_WEBHOOK_ID;
 const webhookToken = process.env.DISCORD_WEBHOOK_TOKEN;
 
-// Create a new Discord webhook client
+const { WebhookClient } = require('discord.js');
 const webhookClient = new WebhookClient(webhookId, webhookToken);
+
+// Rest of the script code for sending the release message using the webhookClient
+
 
 // Function to send a release message
 async function sendReleaseMessage() {
