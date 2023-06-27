@@ -1,10 +1,10 @@
-name: Push Release Details to Discord
+name: Push Release Notes to Discord
 
 on:
   workflow_dispatch
 
 jobs:
-  push-release-details:
+  push-release-notes:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -18,7 +18,7 @@ jobs:
           python3 - <<EOF
           import os
           import requests
-
+          
           github_token = os.getenv('GITHUB_TOKEN')
           repo_owner = 'solankirishav21'
           repo_name = 'published_test'
@@ -26,11 +26,11 @@ jobs:
           url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest'
           response = requests.get(url, headers=headers)
           data = response.json()
-
+          
           tag_name = data.get('tag_name')
           description = data.get('body')
           description_lines = description.split('\\n') if description else []
-
+          
           print(f"::set-output name=tag_name::{tag_name}")
           print(f"::set-output name=description_lines::{description_lines}")
           EOF
@@ -51,8 +51,10 @@ jobs:
           DISCORD_WEBHOOK_TOKEN: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
           RELEASE_TAG: ${{ steps.get_latest_release.outputs.tag_name }}
           RELEASE_DESCRIPTION: |
-            ${{ join(steps.get_latest_release.outputs.description_lines, '\n') }}
+            ${{ join(steps.get_latest_release.outputs.description_lines, '\\n') }}
         run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d "{\"content\": \"New release details:\\nTag: $RELEASE_TAG\\nDescription: $RELEASE_DESCRIPTION\"}" \
+          -d '{
+            "content": "New release details:\\nTag: $RELEASE_TAG\\nDescription: $RELEASE_DESCRIPTION"
+          }' \
           "https://discord.com/api/webhooks/$DISCORD_WEBHOOK_ID/$DISCORD_WEBHOOK_TOKEN"
