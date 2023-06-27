@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Sends custom message
     steps:
-      - name: Sending message
-        uses: nhevia/discord-styled-releases@main
+      - name: Discord - Styled Releases/Patch Notes
+        uses: nhevia/discord-styled-releases@v1.2.3
         with:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
