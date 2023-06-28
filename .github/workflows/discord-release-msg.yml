@@ -1,28 +1,49 @@
-name: Send Release Details to Discord
+name: Push Release Notes to Discord
 
 on:
-  workflow_dispatch:
+  workflow_dispatch
 
 jobs:
-  send_release_details:
+  push-release-notes:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
 
       - name: Get Latest Release
         id: get_latest_release
         run: |
-          RELEASE_TAG=$(git describe --abbrev=0 --tags)
-          RELEASE_DESCRIPTION=$(git log --pretty=format:'- %s' $(git describe --abbrev=0 --tags)^..HEAD)
+          python3 -m pip install --upgrade pip
+          python3 -m pip install requests
+          python3 - <<EOF
+          import os
+          import requests
+          
+          github_token = os.getenv('GITHUB_TOKEN')
+          repo_owner = 'solankirishav21'
+          repo_name = 'published_test'
+          headers = {'Authorization': f'Bearer {github_token}'}
+          url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest'
+          response = requests.get(url, headers=headers)
+          data = response.json()
+          
+          tag_name = data.get('tag_name')
+          description = data.get('body')
+          description_lines = description.split('\\n') if description else []
+          
+          print(f"::set-output name=tag_name::{tag_name}")
+          print(f"::set-output name=description_lines::{description_lines}")
+          EOF
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          echo "::set-output name=tag_name::$RELEASE_TAG"
-          echo "::set-output name=description_lines::$RELEASE_DESCRIPTION"
+      - name: Print Tag Name and Description
+        run: |
+          echo "Tag Name: ${{ steps.get_latest_release.outputs.tag_name }}"
+          echo "Description: |"
+          for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
+            echo "  $line"
+          done
 
       - name: Send Release Details to Discord
         env:
@@ -34,5 +55,5 @@ jobs:
         run: |
           RELEASE_TAG="${RELEASE_TAG}"
           RELEASE_DESCRIPTION="${RELEASE_DESCRIPTION}"
-          PAYLOAD="{\"content\":\"solankirishav21/published_test | Release \`$RELEASE_TAG\`\\n\`$RELEASE_TAG\`\\n\`\`\`json\n$RELEASE_DESCRIPTION\n\`\`\`\"}"
+          PAYLOAD="\`\`\`json\n{\"content\":\"solankirishav21/published_test | Release \`$RELEASE_TAG\`\\n\`$RELEASE_TAG\`\\n\`\`\`$RELEASE_DESCRIPTION\`\`\`\"}\n\`\`\`"
           curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "https://discord.com/api/webhooks/$DISCORD_WEBHOOK_ID/$DISCORD_WEBHOOK_TOKEN"
