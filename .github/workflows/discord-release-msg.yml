@@ -1,4 +1,4 @@
-name: Push Release Notes to Discord
+name: Push Release Notes to Beamer and Discord
 
 on:
   workflow_dispatch
@@ -37,6 +37,36 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Print Tag Name and Description
+        run: |
+          echo "Tag Name: ${{ steps.get_latest_release.outputs.tag_name }}"
+          echo "Description: |"
+          for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
+            echo "  $line"
+          done
+
+      - name: Send Release Details to Beamer
+        env:
+          BEAMER_API_TOKEN: ${{ secrets.BEAMER_API_KEY }}
+          RELEASE_TAG: ${{ steps.get_latest_release.outputs.tag_name }}
+          RELEASE_DESCRIPTION: |
+            ${{ join(steps.get_latest_release.outputs.description_lines, '\n') }}
+        run: |
+          # Push release notes to Beamer
+          IFS=$'\n'
+          for line in $RELEASE_DESCRIPTION; do
+            curl --request POST \
+              --url https://api.getbeamer.com/v0/posts \
+              --header "Content-Type: application/json" \
+              --header "Beamer-Api-Key: $BEAMER_API_TOKEN" \
+              --data "{
+                \"title\": [ \"New Release: $RELEASE_TAG\" ],
+                \"content\": [ \"$line\" ],
+                \"category\": \"new\",
+                \"publish\": true
+              }"
+          done
+
       - name: Send Release Details to Discord
         env:
           DISCORD_WEBHOOK_ID: ${{ secrets.DISCORD_WEBHOOK_ID }}
@@ -45,5 +75,7 @@ jobs:
           RELEASE_DESCRIPTION: |
             ${{ join(steps.get_latest_release.outputs.description_lines, '\n') }}
         run: |
-          PAYLOAD="{\"content\":\"solankirishav21/published_test | Release `$RELEASE_TAG`\\n`$RELEASE_TAG`\\n\`\`\`$RELEASE_DESCRIPTION\`\`\`\"}"
+          RELEASE_TAG="${RELEASE_TAG}"
+          RELEASE_DESCRIPTION="${RELEASE_DESCRIPTION}"
+          PAYLOAD="{\"content\":\"solankirishav21/published_test | Release \`$RELEASE_TAG\`\\n\`$RELEASE_TAG\`\\n\`\`\`$RELEASE_DESCRIPTION\`\`\`\"}"
           curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "https://discord.com/api/webhooks/$DISCORD_WEBHOOK_ID/$DISCORD_WEBHOOK_TOKEN"
