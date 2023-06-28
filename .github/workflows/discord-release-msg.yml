@@ -45,7 +45,6 @@ jobs:
           RELEASE_DESCRIPTION: |
             ${{ join(steps.get_latest_release.outputs.description_lines, '\n') }}
         run: |
-          DESCRIPTION=$(echo "${RELEASE_DESCRIPTION//\'/\"}")  # Replace single quotes with double quotes
-          DESCRIPTION=$(echo "$DESCRIPTION" | awk '{$1="- "$1; print}')  # Add bullet points
+          DESCRIPTION=$(echo "$RELEASE_DESCRIPTION" | awk '{$1="- "$1; print}')  # Add bullet points
           MESSAGE="solankirishav21/published_test | Release $RELEASE_TAG\n$RELEASE_TAG\n$DESCRIPTION"
-          echo "{\"content\": \"$MESSAGE\"}" | curl -H "Content-Type: application/json" -d @- -X POST "https://discord.com/api/webhooks/$DISCORD_WEBHOOK_ID/$DISCORD_WEBHOOK_TOKEN"
+          curl -X POST -H "Content-Type: application/json" -d "{\"content\": \"$MESSAGE\"}" "https://discord.com/api/webhooks/$DISCORD_WEBHOOK_ID/$DISCORD_WEBHOOK_TOKEN"
