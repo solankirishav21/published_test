@@ -1,9 +1,7 @@
 name: Send Release Details to Discord
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch
 
 jobs:
   send_release_details:
