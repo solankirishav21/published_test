@@ -1,4 +1,4 @@
-name: Push Release Notes to Beamer and Discord
+name: Push Release Notes to Discord
 
 on:
   workflow_dispatch
@@ -37,42 +37,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Print Tag Name and Description
-        run: |
-          echo "Tag Name: ${{ steps.get_latest_release.outputs.tag_name }}"
-          echo "Description: |"
-          for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
-            echo "  $line"
-          done
-
-      - name: Push Release Notes to Beamer
-        env:
-          BEAMER_API_TOKEN: ${{ secrets.BEAMER_API_KEY }}
-          RELEASE_TAG: ${{ steps.get_latest_release.outputs.tag_name }}
-          RELEASE_NOTES: |
-            ${{ join(steps.get_latest_release.outputs.description_lines, '\\n') }}
-        run: |
-          # Push release notes to Beamer
-          IFS=$'\n'
-          for line in $RELEASE_NOTES; do
-            curl --request POST \
-              --url https://api.getbeamer.com/v0/posts \
-              --header "Content-Type: application/json" \
-              --header "Beamer-Api-Key: $BEAMER_API_TOKEN" \
-              --data "{
-                \"title\": [ \"New Release: $RELEASE_TAG\" ],
-                \"content\": [ \"$line\" ],
-                \"category\": \"new\",
-                \"publish\": true
-              }"
-          done
-
       - name: Send Release Details to Discord
         env:
           DISCORD_WEBHOOK_ID: ${{ secrets.DISCORD_WEBHOOK_ID }}
           DISCORD_WEBHOOK_TOKEN: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
           RELEASE_TAG: ${{ steps.get_latest_release.outputs.tag_name }}
           RELEASE_DESCRIPTION: |
-            ${{ join(steps.get_latest_release.outputs.description_lines, '\\n') }}
+            ${{ join(steps.get_latest_release.outputs.description_lines, '\n') }}
         run: |
-          echo "{\"content\": \"New release details:\\nTag: $RELEASE_TAG\\nDescription: $RELEASE_DESCRIPTION\"}" | curl -H "Content-Type: application/json" -d @- -X POST "https://discord.com/api/webhooks/$DISCORD_WEBHOOK_ID/$DISCORD_WEBHOOK_TOKEN"
+          DESCRIPTION=$(echo "${RELEASE_DESCRIPTION//\'/\"}")  # Replace single quotes with double quotes
+          DESCRIPTION=$(echo "$DESCRIPTION" | awk '{$1="- "$1; print}')  # Add bullet points
+          MESSAGE="solankirishav21/published_test | Release $RELEASE_TAG\n$RELEASE_TAG\n$DESCRIPTION"
+          echo "{\"content\": \"$MESSAGE\"}" | curl -H "Content-Type: application/json" -d @- -X POST "https://discord.com/api/webhooks/$DISCORD_WEBHOOK_ID/$DISCORD_WEBHOOK_TOKEN"
