@@ -1,7 +1,7 @@
 name: Send Release Details to Discord
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
 
 jobs:
   send_release_details:
@@ -14,9 +14,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14
-
-      - name: Install dependencies
-        run: npm install
 
       - name: Get Latest Release
         id: get_latest_release
@@ -39,4 +36,3 @@ jobs:
           RELEASE_DESCRIPTION="${RELEASE_DESCRIPTION}"
           PAYLOAD="{\"content\":\"solankirishav21/published_test | Release \`$RELEASE_TAG\`\\n\`$RELEASE_TAG\`\\n\`\`\`json\n$RELEASE_DESCRIPTION\n\`\`\`\"}"
           curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "https://discord.com/api/webhooks/$DISCORD_WEBHOOK_ID/$DISCORD_WEBHOOK_TOKEN"
-``
