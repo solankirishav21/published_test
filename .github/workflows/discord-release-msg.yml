@@ -1,4 +1,4 @@
-name: Push Release Notes to Beamer and Discord
+name: Push Release Notes to Discord
 
 on:
   workflow_dispatch
@@ -43,28 +43,6 @@ jobs:
           echo "Description: |"
           for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
             echo "  $line"
-          done
-
-      - name: Send Release Details to Beamer
-        env:
-          BEAMER_API_TOKEN: ${{ secrets.BEAMER_API_KEY }}
-          RELEASE_TAG: ${{ steps.get_latest_release.outputs.tag_name }}
-          RELEASE_DESCRIPTION: |
-            ${{ join(steps.get_latest_release.outputs.description_lines, '\n') }}
-        run: |
-          # Push release notes to Beamer
-          IFS=$'\n'
-          for line in $RELEASE_DESCRIPTION; do
-            curl --request POST \
-              --url https://api.getbeamer.com/v0/posts \
-              --header "Content-Type: application/json" \
-              --header "Beamer-Api-Key: $BEAMER_API_TOKEN" \
-              --data "{
-                \"title\": [ \"New Release: $RELEASE_TAG\" ],
-                \"content\": [ \"$line\" ],
-                \"category\": \"new\",
-                \"publish\": true
-              }"
           done
 
       - name: Send Release Details to Discord
