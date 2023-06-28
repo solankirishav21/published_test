@@ -53,7 +53,7 @@ jobs:
           RELEASE_DESCRIPTION: |
             ${{ join(steps.get_latest_release.outputs.description_lines, '\n') }}
         run: |
-          RELEASE_TAG="${RELEASE_TAG}"
-          RELEASE_DESCRIPTION="${RELEASE_DESCRIPTION}"
-          PAYLOAD=$(jq -n --arg content "solankirishav21/published_test | Release \`$RELEASE_TAG\`\\n\`$RELEASE_TAG\`\\n\`\`\`$RELEASE_DESCRIPTION\`\`\`" '{"content": $content}')
-          curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "https://discord.com/api/webhooks/$DISCORD_WEBHOOK_ID/$DISCORD_WEBHOOK_TOKEN"
+         RELEASE_TAG="${RELEASE_TAG}"
+         RELEASE_DESCRIPTION="${RELEASE_DESCRIPTION}"
+         PAYLOAD=$(jq -n --arg content "solankirishav21/published_test | Release \`$RELEASE_TAG\`\\n\`\`\`json\n{\n  \"tag\": \"$RELEASE_TAG\",\n  \"description\": \"$RELEASE_DESCRIPTION\"\n}\n\`\`\`" '{"content": $content}')
+         curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "https://discord.com/api/webhooks/$DISCORD_WEBHOOK_ID/$DISCORD_WEBHOOK_TOKEN"
