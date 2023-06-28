@@ -55,5 +55,5 @@ jobs:
         run: |
           RELEASE_TAG="${RELEASE_TAG}"
           RELEASE_DESCRIPTION="${RELEASE_DESCRIPTION}"
-          PAYLOAD="\`\`\`json\n{\"content\":\"solankirishav21/published_test | Release \`$RELEASE_TAG\`\\n\`$RELEASE_TAG\`\\n\`\`\`$RELEASE_DESCRIPTION\`\`\`\"}\n\`\`\`"
+          PAYLOAD=$(jq -n --arg content "solankirishav21/published_test | Release \`$RELEASE_TAG\`\\n\`$RELEASE_TAG\`\\n\`\`\`$RELEASE_DESCRIPTION\`\`\`" '{"content": $content}')
           curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "https://discord.com/api/webhooks/$DISCORD_WEBHOOK_ID/$DISCORD_WEBHOOK_TOKEN"
