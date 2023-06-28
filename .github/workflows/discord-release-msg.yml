@@ -54,7 +54,5 @@ jobs:
             ${{ join(steps.get_latest_release.outputs.description_lines, '\\n') }}
         run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d '{
-            "content": "New release details:\\nTag: $RELEASE_TAG\\nDescription: $RELEASE_DESCRIPTION"
-          }' \
+          -d "{\\"content\\": \\"New release details:\\nTag: $RELEASE_TAG\\nDescription: $RELEASE_DESCRIPTION\\"}" \
           "https://discord.com/api/webhooks/$DISCORD_WEBHOOK_ID/$DISCORD_WEBHOOK_TOKEN"
