@@ -39,7 +39,7 @@ jobs:
               for line in description_lines[1:-1]:  # Exclude the last line
                   if 'by' in line:
                       line = line.split('by', 1)[0].strip()
-                  release_notes += f'<li>{line}</li>'
+                  release_notes += f'<li>{line[1:]}</li>'
           release_notes += '</ul>'
           release_notes2 = '<p>More...</p>'
           release_notes2 += '<ul></ul>'
