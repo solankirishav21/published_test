@@ -69,8 +69,7 @@ jobs:
             --header "Beamer-Api-Key: $BEAMER_API_TOKEN" \
             --data "{
               \"title\": [ \"New Release: $RELEASE_TAG\" ],
-              \"content\": [ \"$RELEASE_NOTES\" ],
+              \"content\": \"$RELEASE_NOTES\",
               \"category\": \"new\",
               \"publish\": true
             }"
-
