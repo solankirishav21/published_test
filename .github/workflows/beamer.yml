@@ -36,9 +36,7 @@ jobs:
           if description_lines:
               first_line = description_lines[0].lstrip('#').strip()
               release_notes += f'<h3>{first_line}</h3>'
-              for line in description_lines[1:-1]:  # Exclude the last line
-                  if 'by' in line:
-                      line = line.split('by', 1)[0].strip()
+              for line in description_lines[1:]:
                   release_notes += f'<li>{line}</li>'
           release_notes += '</ul>'
           release_notes2 = '<p>More...</p>'
