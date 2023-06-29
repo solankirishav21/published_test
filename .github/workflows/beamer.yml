@@ -34,7 +34,8 @@ jobs:
           
           release_notes = '<ul>'
           if description_lines:
-            release_notes += f'<h3>{description_lines[0]}</h3>'
+            first_line = description_lines[0].lstrip('#').strip()
+            release_notes += f'<h3>{first_line}</h3>'
             for line in description_lines[1:]:
               release_notes += f'<li>{line[1:]}</li>'
           release_notes += '</ul>'
