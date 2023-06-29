@@ -31,14 +31,12 @@ jobs:
           description = data.get('body')
           description_lines = description.split('\n') if description else []
           description_lines = [line.strip() for line in description_lines if line.strip()]
-          if description_lines:
-            description_lines[0] = description_lines[0][1:]
-            for i in range(1, len(description_lines)):
-              description_lines[i] = description_lines[i][1:]
           
           release_notes = '<ul>'
-          for line in description_lines:
-            release_notes += f'<li>{line}</li>'
+          if description_lines:
+            release_notes += f'<h3>{description_lines[0]}</h3>'
+            for line in description_lines[1:]:
+              release_notes += f'<li>{line}</li>'
           release_notes += '</ul>'
           
           print(f"::set-output name=tag_name::{tag_name}")
