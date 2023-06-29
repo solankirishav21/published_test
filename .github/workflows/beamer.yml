@@ -29,7 +29,8 @@ jobs:
           
           tag_name = data.get('tag_name')
           description = data.get('body')
-          description_lines = description.split('\\n') if description else []
+          description_lines = description.split('\n') if description else []
+          description_lines = [line.strip() for line in description_lines if line.strip()]
           
           print(f"::set-output name=tag_name::{tag_name}")
           print(f"::set-output name=description_lines::{description_lines}")
