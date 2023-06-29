@@ -39,6 +39,8 @@ jobs:
             for line in description_lines[1:]:
               release_notes += f'<li>{line[1:]}</li>'
           release_notes += '</ul>'
+           release_notes2 = '<p>More...</p>'
+           release_notes2 = '<ul></ul>'
           release_notes2 = '<p>'
           release_notes2 += '<a href=https://discord.com/invite/Wpc6xVME4s >'
           release_notes2 += '</a>'
