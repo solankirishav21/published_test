@@ -40,29 +40,30 @@ jobs:
       - name: Print Tag Name and Description
         run: |
           echo "Tag Name: ${{ steps.get_latest_release.outputs.tag_name }}"
-          echo "Description: |"
+          echo "Description: <ul>"
           for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
-            echo "  $line"
+            echo "  <li>$line</li>"
           done
+          echo "</ul>"
 
       - name: Push Release Notes to Beamer
         env:
           BEAMER_API_TOKEN: ${{ secrets.BEAMER_API_KEY }}
           RELEASE_TAG: ${{ steps.get_latest_release.outputs.tag_name }}
           RELEASE_NOTES: |
-            ${{ join(steps.get_latest_release.outputs.description_lines, '\n') }}
+              ${{ join(steps.get_latest_release.outputs.description_lines, '\n') }}
         run: |
           # Push release notes to Beamer
           IFS=$'\n'
           for line in $RELEASE_NOTES; do
-            curl --request POST \
-              --url https://api.getbeamer.com/v0/posts \
-              --header "Content-Type: application/json" \
-              --header "Beamer-Api-Key: $BEAMER_API_TOKEN" \
-              --data "{
-                \"title\": [ \"New Release: $RELEASE_TAG\" ],
-                \"content\": [ \"$line\" ],
-                \"category\": \"new\",
-                \"publish\": true
-              }"
+              curl --request POST \
+                --url https://api.getbeamer.com/v0/posts \
+                --header "Content-Type: application/json" \
+                --header "Beamer-Api-Key: $BEAMER_API_TOKEN" \
+                --data "{
+                  \"title\": [ \"New Release: $RELEASE_TAG\" ],
+                  \"content\": [ \"$line\" ],
+                  \"category\": \"new\",
+                  \"publish\": true
+          }"
           done
