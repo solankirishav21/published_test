@@ -39,7 +39,7 @@ jobs:
             for line in description_lines[1:]:
               release_notes += f'<li>{line[1:]}</li>'
           release_notes += '</ul>'
-          release_notes2 = `<p>HI</p>`
+          release_notes2 = '<p>HI</p>'
           release_notes = release_notes + release_notes2
           
           print(f"::set-output name=tag_name::{tag_name}")
