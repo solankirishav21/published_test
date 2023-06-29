@@ -36,7 +36,7 @@ jobs:
           if description_lines:
             release_notes += f'<h3>{description_lines[0]}</h3>'
             for line in description_lines[1:]:
-              release_notes += f'<li>{line}</li>'
+              release_notes += f'<li>{line[1:]}</li>'
           release_notes += '</ul>'
           
           print(f"::set-output name=tag_name::{tag_name}")
