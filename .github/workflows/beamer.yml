@@ -33,7 +33,8 @@ jobs:
           description_lines = [line.strip() for line in description_lines if line.strip()]
           if description_lines:
             description_lines[0] = description_lines[0][1:]
-            description_lines[-1] = description_lines[-1][:-1]
+            for i in range(1, len(description_lines)):
+              description_lines[i] = description_lines[i][1:]
           
           release_notes = '<ul>'
           for line in description_lines:
