@@ -39,7 +39,7 @@ jobs:
             for line in description_lines[1:]:
               release_notes += f'<li>{line[1:]}</li>'
           release_notes += '</ul>'
-          release_notes2 = `p class=""><a href="https://discord.com/invite/Wpc6xVME4s" target="_blank" rel="noopener nofollow"></a></p><ul><a href="https://discord.com/invite/Wpc6xVME4s" target="_blank" rel="noopener nofollow"></a><li><a href="https://discord.com/invite/Wpc6xVME4s" target="_blank" rel="noopener nofollow"></a><a href="https://discord.com/invite/Wpc6xVME4s" target="_blank" rel="noopener nofollow">Join Discord </a>to know more</li><li>Star Akto on <a href="https://github.com/akto-api-security/akto" target="_blank" rel="noopener nofollow">Github</a></li></ul>`
+          release_notes2 = `<p><a href="https://discord.com/invite/Wpc6xVME4s" target="_blank" rel="noopener nofollow"></a></p><ul><a href="https://discord.com/invite/Wpc6xVME4s" target="_blank" rel="noopener nofollow"></a><li><a href="https://discord.com/invite/Wpc6xVME4s" target="_blank" rel="noopener nofollow"></a><a href="https://discord.com/invite/Wpc6xVME4s" target="_blank" rel="noopener nofollow">Join Discord </a>to know more</li><li>Star Akto on <a href="https://github.com/akto-api-security/akto" target="_blank" rel="noopener nofollow">Github</a></li></ul>`
           release_notes = release_notes + release_notes2
           
           print(f"::set-output name=tag_name::{tag_name}")
