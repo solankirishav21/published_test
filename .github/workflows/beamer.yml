@@ -76,7 +76,7 @@ jobs:
             --header "Content-Type: application/json" \
             --header "Beamer-Api-Key: $BEAMER_API_TOKEN" \
             --data "{
-              \"title\": [ \"New Release: $RELEASE_TAG\" ],
+              \"title\": [ \"Release $RELEASE_TAG\" ],
               \"content\": [ \"$RELEASE_NOTES\" ],
               \"category\": \"new\",
               \"publish\": true
