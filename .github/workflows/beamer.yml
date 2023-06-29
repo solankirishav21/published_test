@@ -43,7 +43,7 @@ jobs:
       
           
           print(f"::set-output name=tag_name::{tag_name}")
-          print(f"::set-output name=release_notes2::{release_notes2}")
+          print(f"::set-output name=release_notes::{release_notes}")
           EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -51,13 +51,13 @@ jobs:
       - name: Print Tag Name and Description
         run: |
           echo "Tag Name: ${{ steps.get_latest_release.outputs.tag_name }}"
-          echo "Description: ${{ steps.get_latest_release.outputs.release_notes2 }}"
+          echo "Description: ${{ steps.get_latest_release.outputs.release_notes }}"
 
       - name: Push Release Notes to Beamer
         env:
           BEAMER_API_TOKEN: ${{ secrets.BEAMER_API_KEY }}
           RELEASE_TAG: ${{ steps.get_latest_release.outputs.tag_name }}
-          RELEASE_NOTES: ${{ steps.get_latest_release.outputs.release_notes2}}
+          RELEASE_NOTES: ${{ steps.get_latest_release.outputs.release_notes}}
         run: |
           # Push release notes to Beamer
           curl --request POST \
