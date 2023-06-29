@@ -35,8 +35,13 @@ jobs:
             description_lines[0] = description_lines[0][1:]
             description_lines[-1] = description_lines[-1][:-1]
           
+          release_notes = '<ul>'
+          for line in description_lines:
+            release_notes += f'<li>{line}</li>'
+          release_notes += '</ul>'
+          
           print(f"::set-output name=tag_name::{tag_name}")
-          print(f"::set-output name=description_lines::{description_lines}")
+          print(f"::set-output name=release_notes::{release_notes}")
           EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,8 +49,22 @@ jobs:
       - name: Print Tag Name and Description
         run: |
           echo "Tag Name: ${{ steps.get_latest_release.outputs.tag_name }}"
-          echo "Description: <ul>"
-          for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
-            echo "  <li>$line</li>"
-          done
-          echo "</ul>"
+          echo "Description: ${{ steps.get_latest_release.outputs.release_notes }}"
+
+      - name: Push Release Notes to Beamer
+        env:
+          BEAMER_API_TOKEN: ${{ secrets.BEAMER_API_KEY }}
+          RELEASE_TAG: ${{ steps.get_latest_release.outputs.tag_name }}
+          RELEASE_NOTES: ${{ steps.get_latest_release.outputs.release_notes }}
+        run: |
+          # Push release notes to Beamer
+          curl --request POST \
+            --url https://api.getbeamer.com/v0/posts \
+            --header "Content-Type: application/json" \
+            --header "Beamer-Api-Key: $BEAMER_API_TOKEN" \
+            --data "{
+              \"title\": [ \"New Release: $RELEASE_TAG\" ],
+              \"content\": [ \"$RELEASE_NOTES\" ],
+              \"category\": \"new\",
+              \"publish\": true
+            }"
