@@ -47,27 +47,29 @@ jobs:
           echo "</ul>"
 
       - name: Push Release Notes to Beamer
-        env:  
+        env:
           BEAMER_API_TOKEN: ${{ secrets.BEAMER_API_KEY }}
           RELEASE_TAG: ${{ steps.get_latest_release.outputs.tag_name }}
           RELEASE_NOTES: |
             ${{ join(steps.get_latest_release.outputs.description_lines, '\n') }}
         run: |
-         # Push release notes to Beamer
+          # Push release notes to Beamer
           IFS=$'\n'
-          DESCRIPTION_HTML="<ul>"
+          DESCRIPTION_HTML=""
           for line in $RELEASE_NOTES; do
-            DESCRIPTION_HTML+="<li>$line</li>"
+            DESCRIPTION_HTML+="$line\n"
           done
-          DESCRIPTION_HTML+="</ul>"
-    
+
+          # Escape the HTML content and enclose in double quotes
+          ESCAPED_DESCRIPTION_HTML=$(printf '%s' "$DESCRIPTION_HTML" | jq -sRr @json)
+
           curl --request POST \
             --url https://api.getbeamer.com/v0/posts \
             --header "Content-Type: application/json" \
             --header "Beamer-Api-Key: $BEAMER_API_TOKEN" \
             --data "{
               \"title\": [ \"New Release: $RELEASE_TAG\" ],
-              \"content\": [ \"$DESCRIPTION_HTML\" ],
+              \"content\": $ESCAPED_DESCRIPTION_HTML,
               \"category\": \"new\",
               \"publish\": true
             }"
