@@ -7,70 +7,36 @@ jobs:
   push-release-notes:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Get Latest Release
-        id: get_latest_release
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install requests
-          python3 - <<EOF
-          import os
-          import requests
-          
-          github_token = os.getenv('GITHUB_TOKEN')
-          repo_owner = 'solankirishav21'
-          repo_name = 'published_test'
-          headers = {'Authorization': f'Bearer {github_token}'}
-          url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest'
-          response = requests.get(url, headers=headers)
-          data = response.json()
-          
-          tag_name = data.get('tag_name')
-          description = data.get('body')
-          description_lines = description.split('\\n') if description else []
-          
-          print(f"::set-output name=tag_name::{tag_name}")
-          print(f"::set-output name=description_lines::{description_lines}")
-          EOF
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Print Tag Name and Description
         run: |
-          echo "Tag Name: ${{ steps.get_latest_release.outputs.tag_name }}"
+          echo "Tag Name: V.2.0.1.19"
           echo "Description: <ul>"
-          for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
-            echo "  <li>$line</li>"
-          done
+          echo "<li>It’s common practice to prefix your version names with the letter v.</li>"
+          echo "<li>Some good tag names might be v1.0.0 or v2.3.4.</li>"
+          echo "<li>If the tag isn’t meant for production use, add a pre-release version after the version name.</li>"
+          echo "<li>Some good pre-release versions might be v0.2.0-alpha or v5.9-beta.3.</li>"
           echo "</ul>"
 
       - name: Push Release Notes to Beamer
         env:
           BEAMER_API_TOKEN: ${{ secrets.BEAMER_API_KEY }}
-          RELEASE_TAG: ${{ steps.get_latest_release.outputs.tag_name }}
+          RELEASE_TAG: V.2.0.1.19
           RELEASE_NOTES: |
-            ${{ join(steps.get_latest_release.outputs.description_lines, '\n') }}
+            <ul>
+            <li>It’s common practice to prefix your version names with the letter v.</li>
+            <li>Some good tag names might be v1.0.0 or v2.3.4.</li>
+            <li>If the tag isn’t meant for production use, add a pre-release version after the version name.</li>
+            <li>Some good pre-release versions might be v0.2.0-alpha or v5.9-beta.3.</li>
+            </ul>
         run: |
           # Push release notes to Beamer
-          IFS=$'\n'
-          DESCRIPTION_HTML=""
-          for line in $RELEASE_NOTES; do
-            DESCRIPTION_HTML+="$line\n"
-          done
-
-          # Escape the HTML content and enclose in double quotes
-          ESCAPED_DESCRIPTION_HTML=$(printf '%s' "$DESCRIPTION_HTML" | jq -sRr @json)
-
           curl --request POST \
             --url https://api.getbeamer.com/v0/posts \
             --header "Content-Type: application/json" \
             --header "Beamer-Api-Key: $BEAMER_API_TOKEN" \
             --data "{
               \"title\": [ \"New Release: $RELEASE_TAG\" ],
-              \"content\": $ESCAPED_DESCRIPTION_HTML,
+              \"content\": [ \"$RELEASE_NOTES\" ],
               \"category\": \"new\",
               \"publish\": true
             }"
-
