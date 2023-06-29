@@ -26,18 +26,18 @@ jobs:
           url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest'
           response = requests.get(url, headers=headers)
           data = response.json()
-          
+
           tag_name = data.get('tag_name')
           description = data.get('body')
           description_lines = description.split('\n') if description else []
           description_lines = [line.strip() for line in description_lines if line.strip()]
-          
+
           release_notes = '<ul>'
           if description_lines:
-            first_line = description_lines[0].lstrip('#').strip()
-            release_notes += f'<h3>{first_line}</h3>'
-            for line in description_lines[1:]:
-              release_notes += f'<li>{line[1:]}</li>'
+              first_line = description_lines[0].lstrip('#').strip()
+              release_notes += f'<h3>{first_line}</h3>'
+              for line in description_lines[1:-1]:  # Exclude the last line
+                  release_notes += f'<li>{line[1:]}</li>'
           release_notes += '</ul>'
           release_notes2 = '<p>More...</p>'
           release_notes2 += '<ul></ul>'
