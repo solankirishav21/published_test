@@ -40,7 +40,7 @@ jobs:
               release_notes += f'<li>{line[1:]}</li>'
           release_notes += '</ul>'
           release_notes2 = '<p>'
-          release_notes2 += '<a href=\"https://discord.com/invite/Wpc6xVME4s\" >'
+          release_notes2 += '<a >'
           release_notes2 += '</a>'
           release_notes2 += '</p>'
           release_notes = release_notes+release_notes2
