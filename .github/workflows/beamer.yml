@@ -29,7 +29,7 @@ jobs:
           
           tag_name = data.get('tag_name')
           description = data.get('body')
-          description_lines = description.split('\\n') if description else []
+          description_lines = description.replace('\n', '') if description else ''
           
           print(f"::set-output name=tag_name::{tag_name}")
           print(f"::set-output name=description_lines::{description_lines}")
@@ -46,28 +46,4 @@ jobs:
           done
           echo "</ul>"
 
-      - name: Push Release Notes to Beamer
-        env:
-          BEAMER_API_TOKEN: ${{ secrets.BEAMER_API_KEY }}
-          RELEASE_TAG: ${{ steps.get_latest_release.outputs.tag_name }}
-          RELEASE_NOTES: |
-            <ul>
-              for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
-                  <li>$line</li>"
-              done
-            </ul>
-        run: |
-          # Push release notes to Beamer
-          IFS=$'\n'
-          for line in $RELEASE_NOTES; do
-              curl --request POST \
-                --url https://api.getbeamer.com/v0/posts \
-                --header "Content-Type: application/json" \
-                --header "Beamer-Api-Key: $BEAMER_API_TOKEN" \
-                --data "{
-                  \"title\": [ \"New Release: $RELEASE_TAG\" ],
-                  \"content\": [ \"$line\" ],
-                  \"category\": \"new\",
-                  \"publish\": true
-          }"
-          done
+     
