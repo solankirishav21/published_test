@@ -41,9 +41,8 @@ jobs:
         run: |
           echo "Tag Name: ${{ steps.get_latest_release.outputs.tag_name }}"
           echo "Description: <ul>"
-          for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
-            echo "  <li>$line</li>"
-          done
+          echo "  <li>${{ join(steps.get_latest_release.outputs.description_lines, '</li><li>')}}</li>"
           echo "</ul>"
+
 
      
