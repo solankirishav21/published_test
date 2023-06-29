@@ -29,7 +29,7 @@ jobs:
           
           tag_name = data.get('tag_name')
           description = data.get('body')
-          description_lines = description.replace('\n', '') if description else ''
+          description_lines = description.split('\\n') if description else []
           
           print(f"::set-output name=tag_name::{tag_name}")
           print(f"::set-output name=description_lines::{description_lines}")
@@ -41,8 +41,7 @@ jobs:
         run: |
           echo "Tag Name: ${{ steps.get_latest_release.outputs.tag_name }}"
           echo "Description: <ul>"
-          echo "  <li>${{ join(steps.get_latest_release.outputs.description_lines, '</li><li>')}}</li>"
+          for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
+            echo "  <li>$line</li>"
+          done
           echo "</ul>"
-
-
-     
