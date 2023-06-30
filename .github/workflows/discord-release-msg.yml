@@ -52,6 +52,7 @@ jobs:
           echo "Tag Name: ${{ steps.get_latest_release.outputs.tag }}"
           release_notes="${{ steps.get_latest_release.outputs.release_notes }}"
           formatted_release_notes=$(echo "${release_notes}" | sed -e 's/\./.\n/g')
+          echo "Tag Name: ${{ steps.get_latest_release.outputs.tag }}"
           echo "Description:"
           echo "${formatted_release_notes}"
       - name: Send release message to Discord
@@ -60,7 +61,7 @@ jobs:
           webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
           job: Discord Release Notification
           title: "Release ${{ steps.get_latest_release.outputs.tag  }}"
-          description: ${{(echo "${steps.get_latest_release.outputs.release_notes}" | sed -e 's/\./.\n/g')}}
+          description: ${{ steps.get_latest_release.outputs.release_notes }}
           nofail: true
           nocontext: false
           noprefix: true
