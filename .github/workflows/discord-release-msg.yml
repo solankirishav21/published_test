@@ -27,7 +27,9 @@ jobs:
           response = requests.get(url, headers=headers)
           data = response.json()
           tag = data.get('tag_name')
+          url = data.get('html_url')
           print(f"::set-output name=tag::{tag}")
+          print(f"::set-output name=url::{url}")
           EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -43,4 +45,4 @@ jobs:
           noprefix: true
           nodetail: false
           notimestamp: false
-          url: "https://github.com/solankirishav21/published_test/releases"
+          url: ${{ steps.get_latest_release.outputs.url }}
