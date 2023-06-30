@@ -60,7 +60,7 @@ jobs:
           webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
           job: Discord Release Notification
           title: "Release ${{ steps.get_latest_release.outputs.tag  }}"
-          description: $(echo "${steps.get_latest_release.outputs.release_notes}" | sed -e 's/\./.\n/g')
+          description: ${{(echo "${steps.get_latest_release.outputs.release_notes}" | sed -e 's/\./.\n/g')}}
           nofail: true
           nocontext: false
           noprefix: true
