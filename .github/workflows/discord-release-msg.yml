@@ -22,7 +22,6 @@ jobs:
         id: latest_release
         run: |
           release=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/solankirishav21/published_test/releases/latest")
-          echo "$release" > latest_release.json
           echo "::set-output name=tag::$(echo "$release" | jq -r '.tag_name')"
           echo "::set-output name=description::$(echo "$release" | jq -r '.body')"
 
@@ -33,10 +32,10 @@ jobs:
           echo "Description: ${{ steps.latest_release.outputs.description }}"
 
       - name: Send release message to Discord
-        uses: BjoernPalmqvist/discord-message-action@v3
+        uses: 8398a7/action-discord@v1
         with:
-          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          message: |
+          discord_webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          content: |
             New release: ${{ steps.latest_release.outputs.tag }}
 
             Release notes:
