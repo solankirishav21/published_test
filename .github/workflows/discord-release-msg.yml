@@ -34,15 +34,7 @@ jobs:
 
           release_notes = ''
           if description_lines:
-              first_line = description_lines[0].lstrip('#').strip()
-              release_notes += f'**{first_line}**   '
-              for line in description_lines[1:-1]:  # Exclude the last line
-                  if 'by' in line:
-                      line = line.split('by', 1)[0].strip()
-                      line += '.'
-                  release_notes += f'    {line}'
-                  if line.endswith('.') or line.endswith('*'):
-                      release_notes += '\n'
+              release_notes = '\n'.join(description_lines)
           print(f"::set-output name=tag::{tag}")
           print(f"::set-output name=release_notes::{release_notes}")
           EOF
@@ -53,18 +45,9 @@ jobs:
         run: |
           echo "Tag Name: ${{ steps.get_latest_release.outputs.tag }}"
           release_notes="${{ steps.get_latest_release.outputs.release_notes }}"
-          formatted_release_notes=$(echo "${release_notes}" | sed -e 's/\./.\n/g' -e 's/\*/\*\n/g')
-          echo "Tag Name: ${{ steps.get_latest_release.outputs.tag }}"
+          formatted_release_notes=$(echo "${release_notes}" | sed -e 's/\./.\n/g' -e 's/\*/\n/g')
           echo "Description:"
           echo "${formatted_release_notes}"
-        id: print_release_notes
-
-      - name: Modify Description
-        run: |
-          echo "Modified Description:"
-          echo "${{ steps.print_release_notes.outputs.stdout }}" | awk -v ORS='. ' 'BEGIN{RS=""}{$1=$1}1' | awk -v ORS='\n' '1' > modified_description.txt
-          cat modified_description.txt
-        id: modify_description
 
       - name: Send release message to Discord
         uses: sarisia/actions-status-discord@v1
@@ -72,7 +55,7 @@ jobs:
           webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
           job: Discord Release Notification
           title: "Release ${{ steps.get_latest_release.outputs.tag }}"
-          description: ${{ steps.modify_description.outputs.stdout }}
+          description: ${{ steps.get_latest_release.outputs.release_notes }}
           nofail: true
           nocontext: false
           noprefix: true
