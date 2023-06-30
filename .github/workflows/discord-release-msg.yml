@@ -34,9 +34,16 @@ jobs:
       - name: Send release message to Discord
         uses: sarisia/actions-status-discord@v1
         with:
-          discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          discord_message: |
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          status: success
+          job: Discord Release Notification
+          content: |
             New release: ${{ steps.latest_release.outputs.tag }}
 
             Release notes:
             ${{ steps.latest_release.outputs.description }}
+          nofail: true
+          nocontext: false
+          noprefix: false
+          nodetail: false
+          notimestamp: false
