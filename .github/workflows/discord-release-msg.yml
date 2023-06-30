@@ -53,7 +53,8 @@ jobs:
           release_notes="${{ steps.get_latest_release.outputs.release_notes }}"
           formatted_release_notes=$(echo "${release_notes}" | sed -e 's/\./.\n/g')
           echo "Tag Name: ${{ steps.get_latest_release.outputs.tag }}"
-          echo "Description: ${formatted_release_notes}"
+          echo "Description:"
+          echo "${formatted_release_notes}"
       - name: Send release message to Discord
         uses: sarisia/actions-status-discord@v1
         with:
