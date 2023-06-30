@@ -35,7 +35,6 @@ jobs:
         uses: sarisia/actions-status-discord@v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          status: success
           job: Discord Release Notification
           title: "Release ${{steps.latest_release.outputs.tag}}"
           nofail: true
