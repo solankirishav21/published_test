@@ -2,9 +2,6 @@ name: Discord Release Notification
 on:
   workflow_dispatch:
 
-env:
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 jobs:
   notify_discord:
     runs-on: ubuntu-latest
@@ -24,14 +21,15 @@ jobs:
       - name: Get latest release
         id: latest_release
         run: |
-          release=$(curl -s -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/OWNER/REPO/releases/latest")
+          release=$(curl -s -H "Authorization: token ${{ secrets.MY_TOKEN }}" "https://api.github.com/repos/solankirishav21/published_test/releases/latest")
           tag=$(echo "$release" | jq -r '.tag_name')
           description=$(echo "$release" | jq -r '.body')
 
       - name: Send release message to Discord
         uses: appleboy/discord-action@master
         with:
-          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
           message: >
             "New release: ${{ steps.latest_release.outputs.tag }}
 
