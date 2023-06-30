@@ -1,54 +1,29 @@
-name: Push Release Notes to Discord
-
+name: Discord Release Notification
 on:
-  workflow_dispatch
+  workflow_dispatch:
 
 jobs:
-  push-release-notes:
+  notify_discord:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Get Latest Release
-        id: get_latest_release
+      - name: Get latest release
+        id: latest_release
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install requests
-          python3 - <<EOF
-          import os
-          import requests
-          
-          github_token = os.getenv('GITHUB_TOKEN')
-          repo_owner = 'solankirishav21'
-          repo_name = 'published_test'
-          headers = {'Authorization': f'Bearer {github_token}'}
-          url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest'
-          response = requests.get(url, headers=headers)
-          data = response.json()
+          echo "::set-env name=GH_TOKEN::${{ secrets.GITHUB_TOKEN }}"
+          release=$(curl -s -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/OWNER/REPO/releases/latest")
+          tag=$(echo "$release" | jq -r '.tag_name')
+          description=$(echo "$release" | jq -r '.body')
 
-          tag_name = data.get('tag_name')
-          description = data.get('body')
-          description_lines = description.split('\n') if description else []
-          description_lines = [line.strip() for line in description_lines if line.strip()]
+      - name: Send release message to Discord
+        uses: appleboy/discord-action@v1
+        with:
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          message: >
+            "New release: ${{ steps.latest_release.outputs.tag }}
 
-          release_notes = ''
-          if description_lines:
-              first_line = description_lines[0].lstrip('#').strip()
-              release_notes += f'> **{first_line}**\n'
-              for line in description_lines[1:]:
-                  if 'by' in line:
-                      line = line.split('by', 1)[0].strip()
-                  release_notes += f'- {line}\n'
-          
-          print(f"::set-output name=tag_name::{tag_name}")
-          print(f"::set-output name=release_notes::{release_notes}")
-          EOF
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Print Tag Name and Description
-        run: |
-          echo "Tag Name: ${{ steps.get_latest_release.outputs.tag_name }}"
-          echo "Description:"
-          echo "$(steps.get_latest_release.outputs.release_notes)"
+            Release notes:
+            ${{ steps.latest_release.outputs.description }}"
