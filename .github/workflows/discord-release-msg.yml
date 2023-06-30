@@ -1,4 +1,4 @@
-name: Push Release Notes to Beamer
+name: Push Release Notes to Discord
 
 on:
   workflow_dispatch
