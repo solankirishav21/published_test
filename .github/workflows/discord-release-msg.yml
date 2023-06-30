@@ -24,6 +24,8 @@ jobs:
           release=$(curl -s -H "Authorization: token ${{ secrets.MY_TOKEN }}" "https://api.github.com/repos/solankirishav21/published_test/releases/latest")
           tag=$(echo "$release" | jq -r '.tag_name')
           description=$(echo "$release" | jq -r '.body')
+          echo "Tag: $tag"
+          echo "Description: $description"
 
       - name: Send release message to Discord
         uses: appleboy/discord-action@master
