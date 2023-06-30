@@ -38,6 +38,7 @@ jobs:
           job: Discord Release Notification
           title: "Release ${{steps.latest_release.outputs.tag}}"
           description: "${{ steps.latest_release.outputs.description }}"
+          url: "https://github.com/solankirishav21/published_test/releases"
           nofail: true
           nocontext: false
           noprefix: false
