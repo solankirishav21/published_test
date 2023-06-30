@@ -36,7 +36,8 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
           status: success
-          job: Discord Release Notification
+          job: |
+            Release: ${{ steps.latest_release.outputs.tag }}
           content: |
             New release: ${{ steps.latest_release.outputs.tag }}
 
