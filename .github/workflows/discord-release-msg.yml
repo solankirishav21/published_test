@@ -50,4 +50,7 @@ jobs:
       - name: Print Tag Name and Description
         run: |
           echo "Tag Name: ${{ steps.get_latest_release.outputs.tag_name }}"
-          echo "Description: ${{ steps.get_latest_release.outputs.release_notes }}"
+          echo "Description: |"
+          while IFS= read -r line; do
+            echo "  $line"
+          done <<< "${{ steps.get_latest_release.outputs.release_notes }}"
