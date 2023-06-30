@@ -40,7 +40,7 @@ jobs:
           description: ${{ steps.latest_release.outputs.description }}
           nofail: true
           nocontext: false
-          noprefix: false
-          nodetail: true
+          noprefix: true
+          nodetail: false
           notimestamp: false
           url: "https://github.com/solankirishav21/published_test/releases"
