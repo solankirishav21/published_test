@@ -31,8 +31,25 @@ jobs:
           description = data.get('body')
           description_lines = description.split('\\n') if description else []
           
+          modified_lines = []
+          for line in description_lines:
+            # Remove first and last characters
+            modified_line = line[1:-1]
+            
+            # Remove \r
+            modified_line = modified_line.replace('\r', '')
+            
+            # Skip last line
+            if modified_line == description_lines[-1]:
+              continue
+            
+            modified_lines.append(modified_line)
+          
+          release_description = '\n'.join(modified_lines)
+          
           print(f"::set-output name=tag_name::{tag_name}")
           print(f"::set-output name=description_lines::{description_lines}")
+          print(f"::set-output name=release_description::{release_description}")
           EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,3 +61,6 @@ jobs:
           for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
             echo "  $line"
           done
+
+          echo "Modified Description: |"
+          echo "${{ steps.get_latest_release.outputs.release_description }}"
