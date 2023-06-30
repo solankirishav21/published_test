@@ -41,8 +41,6 @@ jobs:
           nofail: true
           nocontext: false
           noprefix: false
-          nodetail: false
+          nodetail: true
           notimestamp: false
-
           url: "https://github.com/solankirishav21/published_test/releases"
-          color: 8F00FF
