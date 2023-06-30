@@ -55,7 +55,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
           job: Discord Release Notification
-          title: "Release ${{ steps.latest_release.outputs.tag }}"
+          title: "Release ${{ steps.get_latest_release.outputs.tag  }}"
           description: ${{ steps.get_latest_release.outputs.release_notes }}
           nofail: true
           nocontext: false
