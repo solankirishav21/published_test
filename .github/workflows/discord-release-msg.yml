@@ -51,7 +51,7 @@ jobs:
         run: |
           echo "Tag Name: ${{ steps.get_latest_release.outputs.tag }}"
           release_notes="${{ steps.get_latest_release.outputs.release_notes }}"
-          formatted_release_notes=$(echo "${release_notes}" | sed -e 's/\./.\n/g')
+          formatted_release_notes=$(echo "${release_notes}" | sed -e 's/\./.\n/g' -e 's/\*/\*\n/g')
           echo "Tag Name: ${{ steps.get_latest_release.outputs.tag }}"
           echo "Description:"
           echo "${formatted_release_notes}"
