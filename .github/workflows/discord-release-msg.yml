@@ -7,14 +7,29 @@ jobs:
   push-release-notes:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Release Details to Discord
-        env:
-          DISCORD_WEBHOOK_ID: ${{ secrets.DISCORD_WEBHOOK_ID }}
-          DISCORD_WEBHOOK_TOKEN: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-          RELEASE_TAG: DEMO-1.0.0.9.1
-          RELEASE_DESCRIPTION: "<ul>\n<li>In this updated code, the payload includes the release tag and description within a JSON object</li><li> and the whole payload is wrapped within the code block in Discord using the json syntax.</li><li> This should result in the tag name being displayed as part of the code block in the Discord message.</li>\n</ul>"
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get Latest Release
+        id: get_latest_release
         run: |
-          RELEASE_TAG="${RELEASE_TAG}"
-          RELEASE_DESCRIPTION="${RELEASE_DESCRIPTION}"
-          PAYLOAD=$(jq -n --arg content "solankirishav21/published_test | Release \`$RELEASE_TAG\`\\n\`\`\`html\n$RELEASE_DESCRIPTION\n\`\`\`" '{"content": $content}')
-          curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" "https://discord.com/api/webhooks/$DISCORD_WEBHOOK_ID/$DISCORD_WEBHOOK_TOKEN"
+          python3 -m pip install --upgrade pip
+          python3 -m pip install requests
+          python3 - <<EOF
+          import os
+          import requests
+          
+          github_token = os.getenv('GITHUB_TOKEN')
+          repo_owner = 'solankirishav21'
+          repo_name = 'published_test'
+          headers = {'Authorization': f'Bearer {github_token}'}
+          url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest'
+          response = requests.get(url, headers=headers)
+          data = response.json()
+
+          tag_name = data.get('tag_name')
+          description = data.get('body')
+          description_lines = description.split('\n') if description else []
+          print(tag_name)
+          print(description_lines)
+          EOF
