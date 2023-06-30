@@ -19,7 +19,7 @@ jobs:
           description=$(echo "$release" | jq -r '.body')
 
       - name: Send release message to Discord
-        uses: appleboy/discord-action@v1
+        uses: appleboy/discord-action@master
         with:
           webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
           message: >
