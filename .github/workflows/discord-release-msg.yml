@@ -21,19 +21,24 @@ jobs:
       - name: Get latest release
         id: latest_release
         run: |
-          release=$(curl -s -H "Authorization: token ${{ secrets.MY_TOKEN }}" "https://api.github.com/repos/solankirishav21/published_test/releases/latest")
-          tag=$(echo "$release" | jq -r '.tag_name')
-          description=$(echo "$release" | jq -r '.body')
-          echo "Tag: $tag"
-          echo "Description: $description"
+          release=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/solankirishav21/published_test/releases/latest")
+          echo "$release" > latest_release.json
+          echo "::set-output name=tag::$(echo "$release" | jq -r '.tag_name')"
+          echo "::set-output name=description::$(echo "$release" | jq -r '.body')"
+
+      - name: Read latest release data
+        id: read_latest_release
+        run: |
+          echo "Tag: ${{ steps.latest_release.outputs.tag }}"
+          echo "Description: ${{ steps.latest_release.outputs.description }}"
 
       - name: Send release message to Discord
         uses: appleboy/discord-action@master
         with:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-          message: >
-            "New release: ${{ steps.latest_release.outputs.tag }}
+          message: |
+            New release: ${{ steps.latest_release.outputs.tag }}
 
             Release notes:
-            ${{ steps.latest_release.outputs.description }}"
+            ${{ steps.latest_release.outputs.description }}
