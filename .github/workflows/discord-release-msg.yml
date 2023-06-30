@@ -36,7 +36,7 @@ jobs:
           if description_lines:
               first_line = description_lines[0].lstrip('#').strip()
               release_notes += f'> **{first_line}**\n'
-              for line in description_lines[1:-1]:  # Exclude the last line
+              for line in description_lines[1:]:
                   if 'by' in line:
                       line = line.split('by', 1)[0].strip()
                   release_notes += f'- {line}\n'
