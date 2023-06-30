@@ -39,6 +39,7 @@ jobs:
           title: "Release ${{steps.latest_release.outputs.tag}}"
           description: "${{ steps.latest_release.outputs.description }}"
           url: "https://github.com/solankirishav21/published_test/releases"
+          color: 8B00D9
           nofail: true
           nocontext: false
           noprefix: false
