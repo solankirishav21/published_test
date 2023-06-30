@@ -41,6 +41,8 @@ jobs:
                       line = line.split('by', 1)[0].strip()
                       line += '.'
                   release_notes += f' {line}'
+          release_notes="${{ steps.get_latest_release.outputs.release_notes }}"
+          formatted_release_notes=$(echo "${release_notes}" | sed -e 's/\./.\n/g')
           print(f"::set-output name=tag::{tag}")
           print(f"::set-output name=release_notes::{release_notes}")
           EOF
@@ -49,9 +51,6 @@ jobs:
 
       - name: Print Tag Name and Description
         run: |
-          echo "Tag Name: ${{ steps.get_latest_release.outputs.tag }}"
-          release_notes="${{ steps.get_latest_release.outputs.release_notes }}"
-          formatted_release_notes=$(echo "${release_notes}" | sed -e 's/\./.\n/g')
           echo "Tag Name: ${{ steps.get_latest_release.outputs.tag }}"
           echo "Description:"
           echo "${formatted_release_notes}"
