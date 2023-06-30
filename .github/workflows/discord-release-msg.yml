@@ -1,4 +1,4 @@
-name: Push Release Notes to Discord
+name: Push Release Notes to Beamer
 
 on:
   workflow_dispatch
@@ -26,30 +26,23 @@ jobs:
           url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest'
           response = requests.get(url, headers=headers)
           data = response.json()
-          
+
           tag_name = data.get('tag_name')
           description = data.get('body')
-          description_lines = description.split('\\n') if description else []
-          
-          modified_lines = []
-          for line in description_lines:
-            # Remove first and last characters
-            modified_line = line[1:-1]
-            
-            # Remove \r
-            modified_line = modified_line.replace('\r', '')
-            
-            # Skip last line
-            if modified_line == description_lines[-1]:
-              continue
-            
-            modified_lines.append(modified_line)
-          
-          release_description = '\n'.join(modified_lines)
+          description_lines = description.split('\n') if description else []
+          description_lines = [line.strip() for line in description_lines if line.strip()]
+
+          release_notes = '> '
+          if description_lines:
+              first_line = description_lines[0].lstrip('#').strip()
+              release_notes += f'**{first_line}**'
+              for line in description_lines[1:-1]:  # Exclude the last line
+                  if 'by' in line:
+                      line = line.split('by', 1)[0].strip()
+                  release_notes += f'{line[1:]}'
           
           print(f"::set-output name=tag_name::{tag_name}")
-          print(f"::set-output name=description_lines::{description_lines}")
-          print(f"::set-output name=release_description::{release_description}")
+          print(f"::set-output name=release_notes::{release_notes}")
           EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,10 +50,4 @@ jobs:
       - name: Print Tag Name and Description
         run: |
           echo "Tag Name: ${{ steps.get_latest_release.outputs.tag_name }}"
-          echo "Description: |"
-          for line in ${{ steps.get_latest_release.outputs.description_lines }}; do
-            echo "  $line"
-          done
-
-          echo "Modified Description: |"
-          echo "${{ steps.get_latest_release.outputs.release_description }}"
+          echo "Description: ${{ steps.get_latest_release.outputs.release_notes }}"
