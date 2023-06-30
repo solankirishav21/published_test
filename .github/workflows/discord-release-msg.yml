@@ -32,10 +32,12 @@ jobs:
           echo "Description: ${{ steps.latest_release.outputs.description }}"
 
       - name: Send release message to Discord
-        uses: 8398a7/action-discord@v1
+        uses: BenBrewerBowman/actions-status-discord@main
         with:
-          discord_webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          content: |
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          job-name: Release Notification
+          status: success
+          message: |
             New release: ${{ steps.latest_release.outputs.tag }}
 
             Release notes:
