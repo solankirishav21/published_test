@@ -30,6 +30,9 @@ jobs:
           tag_name = data.get('tag_name')
           description = data.get('body')
           description_lines = description.split('\n') if description else []
+
+          print("Tag Name:")
           print(tag_name)
-          print(description_lines)
+          print("\nDescription:")
+          print('\n'.join(description_lines))
           EOF
