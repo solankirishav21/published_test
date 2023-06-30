@@ -26,27 +26,11 @@ jobs:
           url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest'
           response = requests.get(url, headers=headers)
           data = response.json()
-
           tag = data.get('tag_name')
-          description = data.get('body')
-          description_lines = description.split('\n') if description else []
-          description_lines = [line.strip() for line in description_lines if line.strip()]
-
-          release_notes = ''
-          if description_lines:
-              release_notes = '\n'.join(description_lines)
-          formatted_release_notes = release_notes.replace('.', '.\n').replace('*', '\n')
           print(f"::set-output name=tag::{tag}")
-          print(f"::set-output name=formatted_release_notes::{formatted_release_notes}")
           EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Print Tag Name and Description
-        run: |
-          echo "Tag Name: ${{ steps.get_latest_release.outputs.tag }}"
-          echo "Description:"
-          echo "${{ steps.get_latest_release.outputs.formatted_release_notes }}"
 
       - name: Send release message to Discord
         uses: sarisia/actions-status-discord@v1
@@ -54,7 +38,6 @@ jobs:
           webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
           job: Discord Release Notification
           title: "Release ${{ steps.get_latest_release.outputs.tag }}"
-          description: ${{ steps.get_latest_release.outputs.formatted_release_notes }}
           nofail: true
           nocontext: false
           noprefix: true
