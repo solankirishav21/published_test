@@ -3,46 +3,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  notify_discord:
+  # The workflow job name
+  discord-notifier:
+    # Name of the enviroment
+    environment: secrets
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
+    # Sequence of tasks
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Get Latest Release
-        id: get_latest_release
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install requests
-          python3 - <<EOF
-          import os
-          import requests
-          
-          github_token = os.getenv('GITHUB_TOKEN')
-          repo_owner = 'solankirishav21'
-          repo_name = 'published_test'
-          headers = {'Authorization': f'Bearer {github_token}'}
-          url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest'
-          response = requests.get(url, headers=headers)
-          data = response.json()
-          tag = data.get('tag_name')
-          url = data.get('html_url')
-          print(f"::set-output name=tag::{tag}")
-          print(f"::set-output name=url::{url}")
-          EOF
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Send release message to Discord
-        uses: sarisia/actions-status-discord@v1
+      - name: Discord Notification
+        uses: tenzin1308/discord-notification@v1.0.0
         with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          job: Discord Release Notification
-          title: "Release ${{ steps.get_latest_release.outputs.tag }}"
-          nofail: true
-          nocontext: false
-          noprefix: true
-          nodetail: false
-          notimestamp: false
-          url: ${{ steps.get_latest_release.outputs.url }}
+          discord-webhook-url: ${{ secrets.WEBHOOKS_URL }}
