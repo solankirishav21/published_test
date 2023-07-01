@@ -56,7 +56,8 @@ jobs:
             "embeds": [
               {
                 "title": "Release ${{ steps.get_latest_release.outputs.tag }}",
-                "description": ${{ steps.get_latest_release.outputs.description }}
+                "description": ${{ steps.get_latest_release.outputs.description }},
+                "color" : 00FF00
               }
             ]
           }' ${{ secrets.DISCORD_WEBHOOK_URL }}
