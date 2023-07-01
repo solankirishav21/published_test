@@ -38,6 +38,9 @@ jobs:
                   if 'by' in description_lines[i]:
                       description_lines[i] = description_lines[i].split('by', 1)[0].strip() + '.'
 
+              # Remove the last line from the description
+              description_lines = description_lines[:-1]
+
               description = '\n'.join(description_lines)
 
           print(f"::set-output name=tag::{tag}")
