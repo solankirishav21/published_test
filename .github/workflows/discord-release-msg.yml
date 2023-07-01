@@ -7,14 +7,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get Latest Release
+        id: get_latest_release
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install requests
+          python3 - <<EOF
+          import os
+          import requests
+          
+          github_token = os.getenv('GITHUB_TOKEN')
+          repo_owner = '<REPO_OWNER>'
+          repo_name = '<REPO_NAME>'
+          headers = {'Authorization': f'Bearer {github_token}'}
+          url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest'
+          response = requests.get(url, headers=headers)
+          data = response.json()
+
+          tag = data.get('tag_name')
+          description = data.get('body')
+
+          print(f"::set-output name=tag::{tag}")
+          print(f"::set-output name=description::{description}")
+          EOF
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Send release message to Discord
         run: |
           curl -X POST -H "Content-Type: application/json" -d '{
-            "content": "New release: v1.0.0",
+            "content": "",
             "embeds": [
               {
-                "title": "Release notes",
-                "description": "- Added feature A\n- Fixed bug B\n- Improved performance"
+                "title": "Release ${{ steps.get_latest_release.outputs.tag }}",
+                "description": ${{ steps.get_latest_release.outputs.description | tojson }}
               }
             ]
           }' ${{ secrets.DISCORD_WEBHOOK_URL }}
