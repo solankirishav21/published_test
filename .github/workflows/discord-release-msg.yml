@@ -31,9 +31,14 @@ jobs:
           tag = data.get('tag_name')
           description = data.get('body')
 
-          # Replace anything after "by" with a "."
-          if 'by' in description:
-              description = description.split('by', 1)[0].strip() + '.'
+          # Replace anything after "by" in each line with a "."
+          if description:
+              description_lines = description.split('\n')
+              for i in range(len(description_lines)):
+                  if 'by' in description_lines[i]:
+                      description_lines[i] = description_lines[i].split('by', 1)[0].strip() + '.'
+
+              description = '\n'.join(description_lines)
 
           print(f"::set-output name=tag::{tag}")
           print(f"::set-output name=description::{json.dumps(description)}")
