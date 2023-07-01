@@ -18,10 +18,11 @@ jobs:
           python3 - <<EOF
           import os
           import requests
+          import json
           
           github_token = os.getenv('GITHUB_TOKEN')
-          repo_owner = '<REPO_OWNER>'
-          repo_name = '<REPO_NAME>'
+          repo_owner = 'solankirishav21'
+          repo_name = 'published_test'
           headers = {'Authorization': f'Bearer {github_token}'}
           url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest'
           response = requests.get(url, headers=headers)
@@ -31,7 +32,7 @@ jobs:
           description = data.get('body')
 
           print(f"::set-output name=tag::{tag}")
-          print(f"::set-output name=description::{description}")
+          print(f"::set-output name=description::{json.dumps(description)}")
           EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -43,7 +44,7 @@ jobs:
             "embeds": [
               {
                 "title": "Release ${{ steps.get_latest_release.outputs.tag }}",
-                "description": ${{ steps.get_latest_release.outputs.description | tojson }}
+                "description": ${{ steps.get_latest_release.outputs.description }}
               }
             ]
           }' ${{ secrets.DISCORD_WEBHOOK_URL }}
