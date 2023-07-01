@@ -84,7 +84,6 @@ jobs:
               \"publish\": true
             }"
             
-jobs:
   notify_discord:
     runs-on: ubuntu-latest
 
