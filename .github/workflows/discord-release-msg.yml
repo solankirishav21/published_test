@@ -35,13 +35,16 @@ jobs:
               for i in range(len(description_lines)):
                   if 'by' in description_lines[i]:
                       description_lines[i] = description_lines[i].split('by', 1)[0].strip() + '.'
-                  description_lines[i] = description_lines[i].replace("'", r"'\''")
+              # Remove the last line from the description
+              description_lines = description_lines[:-1]
               description = '\n'.join(description_lines)
+              description = description.replace("'", r"'\''")
           print(f"::set-output name=tag::{tag}")
           print(f"::set-output name=description::{json.dumps(description)}")
           EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Send release message to Discord
         run: |
