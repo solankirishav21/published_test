@@ -35,7 +35,7 @@ jobs:
               for i in range(len(description_lines)):
                   if 'by' in description_lines[i]:
                       description_lines[i] = description_lines[i].split('by', 1)[0].strip() + '.'
-                  description_lines[i] = description_lines[i].replace("'", r"'\''")
+                  description_lines[i] = description_lines[i].replace("'", r"\'")
               description = '\n'.join(description_lines)
           print(f"::set-output name=tag::{tag}")
           print(f"::set-output name=description::{json.dumps(description)}")
