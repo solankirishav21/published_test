@@ -100,7 +100,7 @@ jobs:
           import os
           import requests
           import json
-          
+
           github_token = os.getenv('GITHUB_TOKEN')
           repo_owner = 'solankirishav21'
           repo_name = 'published_test'
@@ -122,11 +122,12 @@ jobs:
               # Remove the last line from the description
               description_lines = description_lines[:-1]
 
-              description = '\n'.join(description_lines)
+              description = '\n'.join(description_lines).replace("'", "'\''")
 
           print(f"::set-output name=tag::{tag}")
           print(f"::set-output name=description::{json.dumps(description)}")
           EOF
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
