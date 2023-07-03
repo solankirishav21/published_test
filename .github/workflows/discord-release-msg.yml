@@ -39,7 +39,7 @@ jobs:
               description_lines = description_lines[:-1]
               description = '\n'.join(description_lines)
               # Replace single quotes with '\''
-              description = description.replace("'", r"\'")
+              description = description.replace("'", "'\\''")
           print(f"::set-output name=tag::{tag}")
           print(f"::set-output name=description::{json.dumps(description)}")
           EOF
@@ -48,13 +48,12 @@ jobs:
 
       - name: Send release message to Discord
         run: |
-          echo "DESCRIPTION='${{ steps.get_latest_release.outputs.description }}'" >> $GITHUB_ENV
           curl -X POST -H "Content-Type: application/json" -d '{
             "content": "",
             "embeds": [
               {
                 "title": "Release ${{ steps.get_latest_release.outputs.tag }}",
-                "description": ${{ env.DESCRIPTION }}
+                "description": ${{ steps.get_latest_release.outputs.description }}
               }
             ]
           }' ${{ secrets.DISCORD_WEBHOOK_URL }}
