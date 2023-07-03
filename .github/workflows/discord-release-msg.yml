@@ -19,6 +19,7 @@ jobs:
           import os
           import requests
           import json
+          import sys
 
           github_token = os.getenv('GITHUB_TOKEN')
           repo_owner = 'solankirishav21'
@@ -35,13 +36,14 @@ jobs:
               for i in range(len(description_lines)):
                   if 'by' in description_lines[i]:
                       description_lines[i] = description_lines[i].split('by', 1)[0].strip() + '.'
-                  description_lines[i] = description_lines[i].replace("'", r"'\\''")
+                  description_lines[i] = description_lines[i].replace("'", r"'\''")
               description = '\n'.join(description_lines)
-          print(f"::set-output name=tag::{tag}")
-          print(f"::set-output name=description::{json.dumps(description)}")
+          sys.stdout.write(f"::set-output name=tag::{tag}\n")
+          sys.stdout.write(f"::set-output name=description::{json.dumps(description)}\n")
           EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
 
