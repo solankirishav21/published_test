@@ -29,22 +29,22 @@ jobs:
           data = response.json()
           tag = data.get('tag_name')
           description = data.get('body')
-          # Replace anything after "by" in each line with a "."
+          # Perform checks and modifications
           if description:
               description_lines = description.split('\n')
               for i in range(len(description_lines)):
                   if 'by' in description_lines[i]:
                       description_lines[i] = description_lines[i].split('by', 1)[0].strip() + '.'
+                  description_lines[i] = description_lines[i].replace("'", "'\\''")
               # Remove the last line from the description
               description_lines = description_lines[:-1]
               description = '\n'.join(description_lines)
-              # Replace single quotes with '\'' using a backslash escape sequence
-              description = description.replace("'", "'\\''").replace("''", "'\\''")
           print(f"::set-output name=tag::{tag}")
           print(f"::set-output name=description::{json.dumps(description)}")
           EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
 
