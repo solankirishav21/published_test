@@ -36,7 +36,7 @@ jobs:
                   if 'by' in description_lines[i]:
                       description_lines[i] = description_lines[i].split('by', 1)[0].strip() + '.'
                   if "'" in description_lines[i]:
-                      description_lines[i] = description_lines[i].replace("'", "'\'")
+                      description_lines[i] = description_lines[i].replace("'", "''")
               # Remove the last line from the description
               description_lines = description_lines[:-1]
               description = '\n'.join(description_lines) 
