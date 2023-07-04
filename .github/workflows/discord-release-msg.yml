@@ -46,9 +46,6 @@ jobs:
 
       - name: Send release message to Discord
         run: |
-          # Install jq
-          sudo apt-get -y install jq
-
           # Escape the single quote using jq
           escaped_description=$(echo "${{ steps.get_latest_release.outputs.description }}" | jq -Rs 'gsub("'\''"; "'\''\"'\''\"'\''")')
 
