@@ -9,10 +9,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        
-      - name: Install jq
-        run: sudo apt-get install -y jq
-        
+
       - name: Get Latest Release
         id: get_latest_release
         run: |
@@ -39,7 +36,7 @@ jobs:
                   if 'by' in description_lines[i]:
                       description_lines[i] = description_lines[i].split('by', 1)[0].strip() + '.'
                   if "'" in description_lines[i]:
-                      description_lines[i] = description_lines[i].replace("'", "'\''")
+                      description_lines[i] = description_lines[i].replace("'", "\\'")
               # Remove the last line from the description
               description_lines = description_lines[:-1]
               description = '\n'.join(description_lines) 
@@ -51,14 +48,16 @@ jobs:
 
       - name: Send release message to Discord
         run: |
-          payload=$(jq -n --arg tag "${{ steps.get_latest_release.outputs.tag }}" --arg description "${{ steps.get_latest_release.outputs.description }}" '
+          payload=$(cat <<EOM
           {
-            content: "",
-            embeds: [
+            "content": "",
+            "embeds": [
               {
-                title: "Release \($tag)",
-                description: $description | @sh
+                "title": "Release ${{ steps.get_latest_release.outputs.tag }}",
+                "description": "$(<${{ steps.get_latest_release.outputs.description }})"
               }
             ]
-          }')
+          }
+          EOM
+          )
           curl -X POST -H "Content-Type: application/json" -d "$payload" ${{ secrets.DISCORD_WEBHOOK_URL }}
