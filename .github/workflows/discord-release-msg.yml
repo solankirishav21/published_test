@@ -45,12 +45,8 @@ jobs:
 
       - name: Send release message to Discord
         run: |
-          curl -X POST -H "Content-Type: application/json" -d "{
-            \"content\": \"\",
-            \"embeds\": [
-              {
-                \"title\": \"Release ${{ steps.get_latest_release.outputs.tag }}\",
-                \"description\": \"${{ steps.prepare_release_message.outputs.escaped_description }}\"
-              }
-            ]
-          }" ${{ secrets.DISCORD_WEBHOOK_URL }}
+          description="${{ steps.get_latest_release.outputs.description }}"
+          escaped_description=$(echo -e "$description" | awk '{gsub(/"/, "\\\""); print}')
+  
+          echo "::set-output name=escaped_description::$escaped_description"
+          shell: /usr/bin/bash -e {0}
