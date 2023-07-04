@@ -29,30 +29,31 @@ jobs:
           data = response.json()
           tag = data.get('tag_name')
           description = data.get('body')
+          # Replace anything after "by" in each line with a "."
+          if description:
+              description_lines = description.split('\n')
+              for i in range(len(description_lines)):
+                  if 'by' in description_lines[i]:
+                      description_lines[i] = description_lines[i].split('by', 1)[0].strip() + '.'
+                  if "'" in description_lines[i]:
+                      description_lines[i] = description_lines[i].replace("'", "'\''")
+              # Remove the last line from the description
+              description_lines = description_lines[:-1]
+              description = '\n'.join(description_lines) 
           print(f"::set-output name=tag::{tag}")
           print(f"::set-output name=description::{json.dumps(description)}")
           EOF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Prepare release message
-        id: prepare_release_message
-        run: |
-          description="${{ steps.get_latest_release.outputs.description }}"
-          escaped_description=$(echo -n "$description" | sed 's/"/\\"/g' | awk '{printf "%s\\n", $0}')
-
-          echo "::set-output name=escaped_description::$escaped_description"
-
-
       - name: Send release message to Discord
         run: |
-          # Send the release message to Discord
-          curl -X POST -H "Content-Type: application/json" -d "{
-            \"content\": \"\",
-            \"embeds\": [
+          curl -X POST -H "Content-Type: application/json" -d '{
+            "content": "",
+            "embeds": [
               {
-                \"title\": \"Release ${{ steps.get_latest_release.outputs.tag }}\",
-                \"description\": ${{ steps.prepare_release_message.outputs.escaped_description }}
+                "title": "Release ${{ steps.get_latest_release.outputs.tag }}",
+                "description": "${{ steps.get_latest_release.outputs.description }}'\''"
               }
             ]
-          }" ${{ secrets.DISCORD_WEBHOOK_URL }}
+          }' ${{ secrets.DISCORD_WEBHOOK_URL }}
