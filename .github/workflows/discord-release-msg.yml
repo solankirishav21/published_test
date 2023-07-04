@@ -39,8 +39,10 @@ jobs:
         id: prepare_release_message
         run: |
           description="${{ steps.get_latest_release.outputs.description }}"
-          escaped_description=$(echo "$description" | sed 's/"/\\"/g')
+          escaped_description=$(echo -n "$description" | sed 's/"/\\"/g' | awk '{printf "%s\\n", $0}')
+
           echo "::set-output name=escaped_description::$escaped_description"
+
 
       - name: Send release message to Discord
         run: |
