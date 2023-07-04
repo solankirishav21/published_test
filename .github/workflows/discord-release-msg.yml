@@ -47,7 +47,7 @@ jobs:
       - name: Send release message to Discord
         run: |
           # Escape the single quote using jq
-          escaped_description=$(echo "${{ steps.get_latest_release.outputs.description }}" | jq -Rs 'gsub("'\''"; "'\''\"'\''\"'\''")')
+          escaped_description=$(echo "# What's New\\r\\n\\r\\n- To be recognized as a list, all lists.\\n- Th'e text will not be rendered as a.\\n- Bullet point lists can be created.\\n- Similarly, numbered lists can be created.\\n\\r" | jq -Rs 'gsub("'\''"; "'\''\"'\''\"'\''")')
 
           # Send the release message to Discord
           curl -X POST -H "Content-Type: application/json" -d '{
