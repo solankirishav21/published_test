@@ -51,16 +51,14 @@ jobs:
 
       - name: Send release message to Discord
         run: |
-         payload=$(jq -n --arg tag "v21.0.0.1" --arg description "# What's New\r\n\r\n- To be recognized as a list, all lists.\n- The text will not be rendered as a.\n- Bullet point lists can be created.\n- Similarly, numbered lists can be created.\n\r" '
+          payload=$(jq -n --arg tag "${{ steps.get_latest_release.outputs.tag }}" --arg description "${{ steps.get_latest_release.outputs.description }}" '
           {
             content: "",
             embeds: [
               {
                 title: "Release \($tag)",
-                description: $description | @json
+                description: $description
               }
             ]
           }')
           curl -X POST -H "Content-Type: application/json" -d "$payload" ${{ secrets.DISCORD_WEBHOOK_URL }}
-
-
