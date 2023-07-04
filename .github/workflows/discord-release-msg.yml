@@ -46,17 +46,64 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      name: Discord Release Notification
+on:
+  workflow_dispatch:
+
+jobs:
+  notify_discord:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get Latest Release
+        id: get_latest_release
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install requests
+          python3 - <<EOF
+          import os
+          import requests
+          import json
+
+          github_token = os.getenv('GITHUB_TOKEN')
+          repo_owner = 'solankirishav21'
+          repo_name = 'published_test'
+          headers = {'Authorization': f'Bearer {github_token}'}
+          url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest'
+          response = requests.get(url, headers=headers)
+          data = response.json()
+          tag = data.get('tag_name')
+          description = data.get('body')
+          # Replace anything after "by" in each line with a "."
+          if description:
+              description_lines = description.split('\n')
+              for i in range(len(description_lines)):
+                  if 'by' in description_lines[i]:
+                      description_lines[i] = description_lines[i].split('by', 1)[0].strip() + '.'
+                  if "'" in description_lines[i]:
+                      description_lines[i] = description_lines[i].replace("'", "'\''")
+              # Remove the last line from the description
+              description_lines = description_lines[:-1]
+              description = '\n'.join(description_lines) 
+          print(f"::set-output name=tag::{tag}")
+          print(f"::set-output name=description::{json.dumps(description)}")
+          EOF
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Send release message to Discord
         run: |
-          payload=$(jq -n --arg tag "${{ steps.get_latest_release.outputs.tag }}" --arg description "${{ steps.get_latest_release.outputs.description }}" '
-            {
-              "content": "",
-              "embeds": [
-                {
-                  "title": "Release \($tag)",
-                  "description": $description
-                }
-              ]
-            }'
-          )
-          curl -X POST -H "Content-Type: application/json" -d "$payload" ${{ secrets.DISCORD_WEBHOOK_URL }}
+          description=$(echo "${{ steps.get_latest_release.outputs.description }}" | jq -sRr @uri)
+          payload='{
+            "content": "",
+            "embeds": [
+              {
+                "title": "Release ${{ steps.get_latest_release.outputs.tag }}",
+                "description": $description
+              }
+            ]
+          }'
+          curl -X POST -H "Content-Type: application/json" -d "$payload" "${{ secrets.DISCORD_WEBHOOK_URL }}"
