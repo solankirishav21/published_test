@@ -57,7 +57,7 @@ jobs:
             embeds: [
               {
                 title: "Release \($tag)",
-                description: $description
+                description: $description | @sh
               }
             ]
           }')
