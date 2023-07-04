@@ -48,12 +48,13 @@ jobs:
 
       - name: Send release message to Discord
         run: |
-          curl -X POST -H "Content-Type: application/json" -d '{
+          payload='{
             "content": "",
             "embeds": [
               {
                 "title": "Release ${{ steps.get_latest_release.outputs.tag }}",
-                "description": ${{ steps.get_latest_release.outputs.description }}
+                "description": "'"${{ steps.get_latest_release.outputs.description }}"'"
               }
             ]
-          }' ${{ secrets.DISCORD_WEBHOOK_URL }}
+          }'
+          curl -X POST -H "Content-Type: application/json" -d "$payload" ${{ secrets.DISCORD_WEBHOOK_URL }}
