@@ -9,7 +9,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
+        
+      - name: Install jq
+        run: sudo apt-get install -y jq
+        
       - name: Get Latest Release
         id: get_latest_release
         run: |
@@ -48,13 +51,14 @@ jobs:
 
       - name: Send release message to Discord
         run: |
-          payload='{
-            "content": "",
-            "embeds": [
+          payload=$(jq -n --arg tag "${{ steps.get_latest_release.outputs.tag }}" --arg description "${{ steps.get_latest_release.outputs.description }}" '{
+            content: "",
+            embeds: [
               {
-                "title": "Release ${{ steps.get_latest_release.outputs.tag }}",
-                "description": "'"${{ steps.get_latest_release.outputs.description }}"'"
+                title: "Release \($tag)",
+                description: $description
               }
             ]
-          }'
+          }')
           curl -X POST -H "Content-Type: application/json" -d "$payload" ${{ secrets.DISCORD_WEBHOOK_URL }}
+
