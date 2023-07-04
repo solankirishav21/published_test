@@ -39,13 +39,12 @@ jobs:
         id: prepare_release_message
         run: |
           description="${{ steps.get_latest_release.outputs.description }}"
-          escaped_description=$(echo "${description}" | awk '{gsub(/"/, "\\\""); print}')
+          escaped_description=$(echo -e "$description" | awk '{gsub(/"/, "\\\""); print}')
   
           echo "::set-output name=escaped_description::$escaped_description"
 
       - name: Send release message to Discord
         run: |
-          # Send the release message to Discord
           curl -X POST -H "Content-Type: application/json" -d "{
             \"content\": \"\",
             \"embeds\": [
