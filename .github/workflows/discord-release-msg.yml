@@ -46,8 +46,8 @@ jobs:
 
       - name: Send release message to Discord
         run: |
-          # Escape the single quote using sed
-          escaped_description=$(echo -n "${{ steps.get_latest_release.outputs.description }}" | sed "s/'/'\\\\''/g")
+          # Escape the single quote using jq and preserve formatting
+          escaped_description=$(echo -n "${{ steps.get_latest_release.outputs.description }}" | jq -Rr '@sh')
 
           # Send the release message to Discord
           curl -X POST -H "Content-Type: application/json" -d "{
