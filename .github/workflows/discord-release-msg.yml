@@ -35,11 +35,9 @@ jobs:
               for i in range(len(description_lines)):
                   if 'by' in description_lines[i]:
                       description_lines[i] = description_lines[i].split('by', 1)[0].strip() + '.'
-                  if "'" in description_lines[i]:
-                      description_lines[i] = description_lines[i].replace("'", "'\''")
               # Remove the last line from the description
               description_lines = description_lines[:-1]
-              description = '\n'.join(description_lines) 
+              description = '\n'.join(description_lines)
           print(f"::set-output name=tag::{tag}")
           print(f"::set-output name=description::{json.dumps(description)}")
           EOF
@@ -48,18 +46,19 @@ jobs:
 
       - name: Send release message to Discord
         run: |
-          description="${{ steps.get_latest_release.outputs.description }}"
-          description=$(echo "$description" | sed 's/"/\\"/g' | sed 's/\r//g' | awk '{printf "%s\\n", $0}')
-          payload=$(jq -n --arg description "$description" '{
-            content: "",
-            embeds: [
+          # Install jq
+          sudo apt-get -y install jq
+
+          # Escape the single quote using jq
+          escaped_description=$(echo "${{ steps.get_latest_release.outputs.description }}" | jq -Rs 'gsub("'\''"; "'\''\"'\''\"'\''")')
+
+          # Send the release message to Discord
+          curl -X POST -H "Content-Type: application/json" -d '{
+            "content": "",
+            "embeds": [
               {
-                title: "Release ${{ steps.get_latest_release.outputs.tag }}",
-                description: $description,
-                "footer": {
-                  "text": "Your footer text"
-                }
+                "title": "Release ${{ steps.get_latest_release.outputs.tag }}",
+                "description": "'"${escaped_description}"'"
               }
             ]
-          }')
-          curl -X POST -H "Content-Type: application/json" -d "$payload" "${{ secrets.DISCORD_WEBHOOK_URL }}"
+          }' ${{ secrets.DISCORD_WEBHOOK_URL }}
