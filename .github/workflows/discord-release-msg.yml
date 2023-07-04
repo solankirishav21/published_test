@@ -39,7 +39,7 @@ jobs:
               description_lines = description_lines[:-1]
               description = '\n'.join(description_lines)
               # Replace single quotes with '\''
-              description = description.replace("'", "'\\''")
+              description = description.replace("'", "\\'")
           print(f"::set-output name=tag::{tag}")
           print(f"::set-output name=description::{json.dumps(description)}")
           EOF
